@@ -22,3 +22,6 @@ class DatabaseHelper:
 
     def rollback(self):
         self.connection.rollback()
+
+    def close(self):
+        self.connection.close()

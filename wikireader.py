@@ -47,17 +47,13 @@ class WikiReader(xml.sax.ContentHandler):
         elif name == "page":
             self.total_article_processed += 1
 
-        # TODO: SAFETY MESURE REMOVE WHEN SURE
-        # if self.total_article_processed >= 200:
-        #    sys.exit()
-
     # Called with the content of a tag (no xml)
     def characters(self, content):
         if len(self.tag_stack) == 0:
             return
 
         if self.tag_stack[-1] == "text":
-            self.tag_stack += content
+            self.page_text += content
 
         if self.tag_stack[-1] == "title":
             self.page_title += content
