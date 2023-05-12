@@ -4,6 +4,7 @@ import time
 import bz2
 import os
 import xml.sax
+import re
 from threading import Thread
 import signal, sys
 from exitbrake import ExitBrake
@@ -21,7 +22,7 @@ def display(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing, reade
         print("Number of article skipped: {0}".format(reader.total_article_processed - reader.real_article_processed))
         print("")
 
-        #if reader.total_article_processed > 10000:
+        # if reader.total_article_processed > 10000:
         #    print("Braking")
         #    eb.brake()
 
@@ -35,24 +36,39 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
         except queue.Empty:
             continue
 
-        # Ignore pages that are simply redirects (https://en.wikipedia.org/wiki/Help:Redirect
+        # Ignore pages that are simply redirects (https://en.wikipedia.org/wiki/Help:Redirect)
         if len(page_text) >= 9 and page_text[0:8] == "#REDIRECT":
             continue
 
-        # Ignore external links
-        if len(page_text) >= 7 and (page_text[0:6] == "http://" or page_text[0:6] == "https://"):
-            continue
-
         # Begin text processing
-        """openbracket_stack = []
-        for i, c in enumerate(page_text):
-            c = page_text[i]
+        pages_mentioned = []
 
-            if c == "[" and i > 0 and c[i-1] != "\\":
-                openbracket_stack.append("[")"""
+        # First remove nowiki tags (They can't be used as links)
+        page_text = re.sub(r"<nowiki>(.*?)<\/nowiki>", "", page_text)
 
-        # Put the article data into a queue to get it wrote into database
-        wq.put((page_title, []))
+        # Find all possible links
+        for match in re.finditer(r"\[\[(.*?)\]\]", page_text):
+            # Remove wrapped brackets and
+            # get "Page name" if the format is the following [[Page name | Displayed text]]
+            link = page_text[match.start() + 2:match.end() - 2].split("|")[0]  # Remove the 2 brackets
+
+            # Ignore external links
+            if len(link) >= 7 and (link[0:6] == "http://" or link[0:6] == "https://"):
+                continue
+
+            # Get page name without section ( https://en.wikipedia.org/wiki/Help:Link#Section_linking_(anchors) )
+            # [[Page name#Section name|displayed text]] <-- Another page
+            # [[#Section name|displayed text]] <-- Same page
+
+            if len(link) == 0: continue
+
+            if link[0] == "#": continue  # Link to a section in the same page
+
+            link = link.split("#")[0]
+
+            pages_mentioned.append(link)
+
+        wq.put((page_title, pages_mentioned))
 
 
 def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue, db: database.databasehelper.DatabaseHelper):
@@ -66,6 +82,7 @@ def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue, db: database.datab
             db.insertNewArticle(page_title)
 
             for mentioned_page in mentioned_pages:
+                db.insertNewArticle(mentioned_page) # TODO: add unvisited bool? to avoid red links (pages that dont exist)
                 db.insertNewEdgeInArticleLink(page_title, mentioned_page)
             db.commit()
         except mysql.connector.Error as error:
@@ -89,7 +106,7 @@ def main():
 
     # Run x amount of processes that will do analysis on the texts of data
     processes = []
-    for _ in range(6):
+    for _ in range(15):
         pr = multiprocessing.Process(target=processArticle, args=(eb, aq, wq))
         processes.append(pr)
         pr.start()
