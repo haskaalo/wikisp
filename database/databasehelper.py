@@ -7,15 +7,20 @@ class DatabaseHelper:
         self.cursor = cursor
         self.connection = connection
 
-    def insertNewArticle(self, article_title: str):
-        query = "INSERT IGNORE INTO article (title) VALUES (%s)"
+    def insertNewArticles(self, articles_title: list[str], visited: bool):
+        query = "INSERT INTO article (title, visited) " \
+                "VALUES (%s, %s) ON DUPLICATE KEY UPDATE visited=1"
 
-        self.cursor.execute(query, (article_title,))
+        self.cursor.executemany(query, list(map(lambda x: (x, visited), articles_title)))
 
-    def insertNewEdgeInArticleLink(self, from_title: str, to_title: str):
-        query = "INSERT IGNORE INTO article_link_edge_directed (from_article, to_article) VALUES (%s, %s)"
+    def insertNewEdgesInArticleLink(self, from_article: str, to_articles: list[str]):
+        # Add unvisited articles
+        query1 = "INSERT IGNORE INTO article (title, visited) VALUES (%s, %s)"
+        self.cursor.executemany(query1, list(map(lambda x: (x, False), to_articles)))
 
-        self.cursor.execute(query, (from_title, to_title))
+        query2 = "INSERT IGNORE INTO article_link_edge_directed (from_article, to_article) " \
+                 "VALUES (%s, %s)"
+        self.cursor.executemany(query2, list(map(lambda x: (from_article, x), to_articles)))
 
     def commit(self):
         self.connection.commit()

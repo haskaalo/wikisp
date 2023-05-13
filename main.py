@@ -15,7 +15,7 @@ from wikireader import WikiReader
 
 
 def display(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing, reader: WikiReader):
-    while True and not eb.shutdown():
+    while not eb.shutdown():
         print("Number of articles waiting to be processed: {0}".format(aq.qsize()))
         print("Number of processed articles waiting to be written: {0}".format(wq.qsize()))
         print("Number of article processed: {0}".format(reader.real_article_processed))
@@ -69,6 +69,7 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
             pages_mentioned.append(link)
 
         wq.put((page_title, pages_mentioned))
+    print("brake1")
 
 
 def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue, db: database.databasehelper.DatabaseHelper):
@@ -79,11 +80,10 @@ def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue, db: database.datab
             continue
 
         try:
-            db.insertNewArticle(page_title)
+            db.insertNewArticles([page_title], True)
 
-            for mentioned_page in mentioned_pages:
-                db.insertNewArticle(mentioned_page) # TODO: add unvisited bool? to avoid red links (pages that dont exist)
-                db.insertNewEdgeInArticleLink(page_title, mentioned_page)
+            db.insertNewEdgesInArticleLink(page_title, mentioned_pages)
+
             db.commit()
         except mysql.connector.Error as error:
             print("Failed to write to database: {}".format(error))
@@ -98,15 +98,15 @@ def main():
     manager = multiprocessing.Manager()
 
     # This is a queue that can dequeue and enqueue items in different threads? (in a synchronized way)
-    aq = manager.Queue(maxsize=2000)
-    wq = manager.Queue(maxsize=2000)
+    aq = manager.Queue(maxsize=1)
+    wq = manager.Queue(maxsize=1)
 
     # Open the wiki dump
     wiki = bz2.BZ2File(os.environ.get("WIKIGRAPHSTATS_XML_DUMP"))
 
     # Run x amount of processes that will do analysis on the texts of data
     processes = []
-    for _ in range(15):
+    for _ in range(6):
         pr = multiprocessing.Process(target=processArticle, args=(eb, aq, wq))
         processes.append(pr)
         pr.start()
