@@ -47,6 +47,11 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
         # First remove nowiki tags (They can't be used as links)
         page_text = re.sub(r"<nowiki>(.*?)<\/nowiki>", "", page_text)
 
+        # TODO: TESTS
+        for match in re.finditer(r"{{(.*?)}}", page_text):
+            link = page_text[match.start():match.end()]  # Remove the 2 brackets
+            #print(link)
+
         # Find all possible links
         for match in re.finditer(r"\[\[(.*?)\]\]", page_text):
             # Remove wrapped brackets and
@@ -76,13 +81,15 @@ def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue):
     db = database.connect()
 
     while not eb.shutdown() or not wq.empty():
+        if eb.shutdown():
+            break
         if wq.qsize() < 500:
             continue
 
         valid_article_batch = []
         redirect_batch = []
 
-        while len(valid_article_batch) + len(redirect_batch) < 500:
+        while (len(valid_article_batch) + len(redirect_batch) < 500) and not wq.empty():
             page_title, mentioned_pages, redirect = wq.get(block=False)
 
             if redirect:
@@ -121,7 +128,7 @@ def main():
     wq = manager.Queue(maxsize=4000)
 
     # Open the wiki dump
-    wiki = bz2.BZ2File(os.environ.get("WIKIGRAPHSTATS_XML_DUMP"))
+    wiki = bz2.BZ2File(os.environ.get("WIKI_XML_DUMP"))
 
     # Run x amount of processes that will do analysis on the texts of data
     processes = []
