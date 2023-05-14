@@ -10,20 +10,27 @@ class WikiReader(xml.sax.ContentHandler):
         self.filter = ns_filter
         self.callback = callback
 
+        self.redirect_title = None
         self.page_title: Optional[str] = None
         self.page_text: Optional[str] = None
         self.namespace: Optional[int] = None  # Parses only when this = 0 (en.wikipedia.org/wiki/Wikipedia:Namespace)
         self.real_article_processed = 0
         self.total_article_processed = 0
 
+        self.redirect_content = ""
+
     # Called when the XML Reader is starting a new tag
     def startElement(self, name, attrs):
         if name == "ns":
             self.namespace = None
 
+        if name == "redirect":
+            self.redirect_title = attrs['title']
+
         elif name == "page":
             self.page_text = None
             self.page_title = None
+            self.redirect_title = None
 
         elif name == "title":
             self.page_title = ""
@@ -40,10 +47,16 @@ class WikiReader(xml.sax.ContentHandler):
 
         if self.filter(self.namespace):  # is article
             if name == "page":
-                if self.page_text is not None:
-                    self.real_article_processed += 1
-                    self.callback((self.page_title, self.page_text))
-                self.total_article_processed += 1
+                if self.redirect_title is None:
+                    if self.page_text is not None:
+                        self.real_article_processed += 1
+                        self.callback((self.page_title, self.page_text, False))
+                    self.total_article_processed += 1
+                else:
+                    # TODO: redirect queue
+                    self.total_article_processed += 1
+                    self.callback((self.page_title, self.redirect_title, True))
+                    pass
         elif name == "page":
             self.total_article_processed += 1
 
@@ -52,11 +65,11 @@ class WikiReader(xml.sax.ContentHandler):
         if len(self.tag_stack) == 0:
             return
 
-        if self.tag_stack[-1] == "text":
+        elif self.tag_stack[-1] == "text":
             self.page_text += content
 
-        if self.tag_stack[-1] == "title":
+        elif self.tag_stack[-1] == "title":
             self.page_title += content
 
-        if self.tag_stack[-1] == "ns":
+        elif self.tag_stack[-1] == "ns":
             self.namespace = int(content)

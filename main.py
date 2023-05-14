@@ -15,16 +15,17 @@ from wikireader import WikiReader
 
 
 def display(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing, reader: WikiReader):
+    before = 0
+
     while not eb.shutdown():
         print("Number of articles waiting to be processed: {0}".format(aq.qsize()))
         print("Number of processed articles waiting to be written: {0}".format(wq.qsize()))
         print("Number of article processed: {0}".format(reader.real_article_processed))
         print("Number of article skipped: {0}".format(reader.total_article_processed - reader.real_article_processed))
+        print("Processing rate: " + str(reader.real_article_processed - before) + " articles/s")
         print("")
 
-        # if reader.total_article_processed > 10000:
-        #    print("Braking")
-        #    eb.brake()
+        before = reader.real_article_processed
 
         time.sleep(1)
 
@@ -32,12 +33,12 @@ def display(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing, reade
 def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing.Queue):
     while not eb.shutdown() or not aq.empty():
         try:
-            page_title, page_text = aq.get(block=False)
+            page_title, page_text, redirect = aq.get(block=False)
         except queue.Empty:
             continue
 
-        # Ignore pages that are simply redirects (https://en.wikipedia.org/wiki/Help:Redirect)
-        if len(page_text) >= 9 and page_text[0:8] == "#REDIRECT":
+        if redirect:
+            wq.put((page_title, [page_text], True))
             continue
 
         # Begin text processing
@@ -68,38 +69,56 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
 
             pages_mentioned.append(link)
 
-        wq.put((page_title, pages_mentioned))
-    print("brake1")
+        wq.put((page_title, pages_mentioned, False))
 
 
-def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue, db: database.databasehelper.DatabaseHelper):
+def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue):
+    db = database.connect()
+
     while not eb.shutdown() or not wq.empty():
-        try:
-            page_title, mentioned_pages = wq.get(block=False)
-        except queue.Empty:
+        if wq.qsize() < 500:
             continue
 
-        try:
-            db.insertNewArticles([page_title], True)
+        valid_article_batch = []
+        redirect_batch = []
 
-            db.insertNewEdgesInArticleLink(page_title, mentioned_pages)
+        while len(valid_article_batch) + len(redirect_batch) < 500:
+            page_title, mentioned_pages, redirect = wq.get(block=False)
+
+            if redirect:
+                redirect_batch.append((page_title, mentioned_pages[0]))
+            else:
+                valid_article_batch.append((page_title, mentioned_pages))
+
+        try:
+            print("Starting batch")
+
+            # Insert valid article batch
+            db.insertNewArticles(list(map(lambda x: x[0], valid_article_batch)), True)
+            db.insertNewEdgesInArticlesLink(valid_article_batch)
+
+            # Insert redirect article batch
+            if len(redirect_batch) > 0:
+                db.insertNewRedirects(redirect_batch)
 
             db.commit()
+            print("Batch finished running")
         except mysql.connector.Error as error:
             print("Failed to write to database: {}".format(error))
             db.rollback()
 
+    # Closing connection
+    db.close()
+
 
 def main():
-    db = database.connect()
-
     eb = ExitBrake()
 
     manager = multiprocessing.Manager()
 
     # This is a queue that can dequeue and enqueue items in different threads? (in a synchronized way)
-    aq = manager.Queue(maxsize=1)
-    wq = manager.Queue(maxsize=1)
+    aq = manager.Queue(maxsize=1000)
+    wq = manager.Queue(maxsize=4000)
 
     # Open the wiki dump
     wiki = bz2.BZ2File(os.environ.get("WIKIGRAPHSTATS_XML_DUMP"))
@@ -112,7 +131,7 @@ def main():
         pr.start()
 
     # Start thread that will write data to database
-    write_th = Thread(target=writeToDatabase, args=(eb, wq, db))
+    write_th = Thread(target=writeToDatabase, args=(eb, wq))
     write_th.start()
 
     reader = WikiReader(lambda ns: ns == 0, aq.put)

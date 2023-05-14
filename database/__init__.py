@@ -1,30 +1,21 @@
 import mysql.connector as database
 import database.databasehelper as dh
+import sqlite3
 import os
 
-
 def connect():
-    username = os.environ.get("DB_USER") or "root"
-    password = os.environ.get("DB_PASSWORD") or ""
-    host = os.environ.get("DB_HOST") or "localhost"
-    if os.environ.get("DB_PORT") is None:
-        port = 3306
-    else:
-        port = int(os.environ.get("DB_PORT"))
+    db = sqlite3.connect(os.environ.get("SQLITE3_DB_PATH") or "wikigraph.db")
 
-    dbname = os.environ.get("DB_DBNAME")
+    # Create tables if not exist
+    print(os.getcwd())
+    cursor = db.cursor()
+    with open('./database/migrations/1_init_sqlite.sql', 'r') as sql_file:
+        sql_script = sql_file.read()
+    cursor.executescript(sql_script)
+    db.commit()
+    sql_file.close()
 
     try:
-        connection = database.connect(
-            user=username,
-            password=password,
-            host=host,
-            port=port,
-            database=dbname
-        )
-
-        cursor = connection.cursor()
-        print("CONNECTED TO DATABASE!")
-        return dh.DatabaseHelper(cursor, connection)
+        return dh.DatabaseHelper(db)
     except Exception as e:
         raise e
