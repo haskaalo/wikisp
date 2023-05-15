@@ -1,4 +1,3 @@
-import mysql.connector as database
 import database.databasehelper as dh
 import sqlite3
 import os

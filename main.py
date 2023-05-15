@@ -8,7 +8,6 @@ import re
 from threading import Thread
 import signal, sys
 from exitbrake import ExitBrake
-import mysql.connector
 
 import database
 from wikireader import WikiReader
@@ -32,10 +31,7 @@ def display(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing, reade
 
 def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing.Queue):
     while not eb.shutdown() or not aq.empty():
-        try:
-            page_title, page_text, redirect = aq.get(block=False)
-        except queue.Empty:
-            continue
+        page_title, page_text, redirect = aq.get()
 
         if redirect:
             wq.put((page_title, [page_text], True))
@@ -46,11 +42,6 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
 
         # First remove nowiki tags (They can't be used as links)
         page_text = re.sub(r"<nowiki>(.*?)<\/nowiki>", "", page_text)
-
-        # TODO: TESTS
-        for match in re.finditer(r"{{(.*?)}}", page_text):
-            link = page_text[match.start():match.end()]  # Remove the 2 brackets
-            #print(link)
 
         # Find all possible links
         for match in re.finditer(r"\[\[(.*?)\]\]", page_text):
@@ -75,22 +66,21 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
             pages_mentioned.append(link)
 
         wq.put((page_title, pages_mentioned, False))
+    print("Done processing all article!")
 
 
 def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue):
     db = database.connect()
 
     while not eb.shutdown() or not wq.empty():
-        if eb.shutdown():
-            break
-        if wq.qsize() < 500:
+        if wq.qsize() < 500 and not eb.shutdown():
             continue
 
         valid_article_batch = []
         redirect_batch = []
 
-        while (len(valid_article_batch) + len(redirect_batch) < 500) and not wq.empty():
-            page_title, mentioned_pages, redirect = wq.get(block=False)
+        while ((len(valid_article_batch) + len(redirect_batch)) < 500) and not wq.empty():
+            page_title, mentioned_pages, redirect = wq.get()
 
             if redirect:
                 redirect_batch.append((page_title, mentioned_pages[0]))
@@ -110,11 +100,12 @@ def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue):
 
             db.commit()
             print("Batch finished running")
-        except mysql.connector.Error as error:
+        except Exception as error:
             print("Failed to write to database: {}".format(error))
             db.rollback()
 
     # Closing connection
+    print("Closing db connection")
     db.close()
 
 
@@ -154,19 +145,29 @@ def main():
 
         # Terminate article processing (doesn't matter if they were in the middle of doing something)
         for process in processes:
-            process.terminate()
+            if process.is_alive(): process.terminate()
 
         while True:
             if not write_th.is_alive() and not console_display_thread.is_alive():
+                print("Bye bye!")
                 sys.exit()
+            time.sleep(1)
 
     signal.signal(signal.SIGINT, stopHandler)
 
     # Start reading the dumps
     xml.sax.parse(wiki, reader)
-    print("Finished parsing the data!")
-
-    stopHandler(None, None)
+    print("Finished parsing the data! Terminating!")
+    print("Waiting for article in queue to finish")
+    # Wait for articles in queues to finish
+    while True:
+        should_continue = False
+        for process in processes:
+            if process.is_alive():
+                should_continue = True
+                break
+        if not should_continue:
+            stopHandler(None, None)
 
 
 if __name__ == "__main__":
