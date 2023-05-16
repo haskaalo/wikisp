@@ -1,5 +1,4 @@
 import multiprocessing
-import queue
 import time
 import bz2
 import os
@@ -67,6 +66,7 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
 
         wq.put((page_title, pages_mentioned, False))
     print("Done processing all article!")
+    sys.exit() # Terminate "sub"-process
 
 
 def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue):
@@ -105,7 +105,7 @@ def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue):
             db.rollback()
 
     # Closing connection
-    print("Closing db connection")
+    print("Closing db connection!!!")
     db.close()
 
 
@@ -123,7 +123,7 @@ def main():
 
     # Run x amount of processes that will do analysis on the texts of data
     processes = []
-    for _ in range(6):
+    for _ in range(1):
         pr = multiprocessing.Process(target=processArticle, args=(eb, aq, wq))
         processes.append(pr)
         pr.start()
@@ -144,8 +144,9 @@ def main():
         eb.brake()
 
         # Terminate article processing (doesn't matter if they were in the middle of doing something)
-        for process in processes:
-            if process.is_alive(): process.terminate()
+        for p in processes:
+            if p.is_alive():
+                p.terminate()
 
         while True:
             if not write_th.is_alive() and not console_display_thread.is_alive():
@@ -159,14 +160,20 @@ def main():
     xml.sax.parse(wiki, reader)
     print("Finished parsing the data! Terminating!")
     print("Waiting for article in queue to finish")
+
+    eb.brake()
+
     # Wait for articles in queues to finish
     while True:
-        should_continue = False
+        time.sleep(1)
+        should_end = False
+
+        # Wait for all processes to finish
         for process in processes:
             if process.is_alive():
-                should_continue = True
+                should_end = True
                 break
-        if not should_continue:
+        if should_end:
             stopHandler(None, None)
 
 
