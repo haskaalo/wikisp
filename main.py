@@ -7,7 +7,7 @@ import re
 from threading import Thread
 import signal, sys
 from exitbrake import ExitBrake
-
+import argparse
 import database
 from wikireader import WikiReader
 
@@ -178,4 +178,18 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--reformat_db", action="store_true")
+
+    args = parser.parse_args()
+    if args.reformat_db:
+        db = database.connect()
+        try:
+            db.reformatData()
+            db.commit()
+        except Exception as e:
+            print("Failed to write to database: {}".format(e))
+            db.rollback()
+        db.close()
+    else:
+        main()

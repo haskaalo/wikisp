@@ -25,7 +25,7 @@ class WikiReader(xml.sax.ContentHandler):
             self.namespace = None
 
         if name == "redirect":
-            self.redirect_title = attrs['title']
+            self.redirect_title = attrs['title'][0].upper() + attrs['title'][1:]
 
         elif name == "page":
             self.page_text = None
@@ -52,11 +52,9 @@ class WikiReader(xml.sax.ContentHandler):
                         self.real_article_processed += 1
                         self.callback((self.page_title, self.page_text, False))
                     self.total_article_processed += 1
-                else:
-                    # TODO: redirect queue
+                else:  # is a redirect
                     self.total_article_processed += 1
                     self.callback((self.page_title, self.redirect_title, True))
-                    pass
         elif name == "page":
             self.total_article_processed += 1
 

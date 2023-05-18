@@ -17,6 +17,5 @@ CREATE TABLE IF NOT EXISTS article_link_edge_directed (
 CREATE TABLE IF NOT EXISTS redirect (
     from_article varblob(256) NOT NULL,
     to_article varblob(256) NOT NULL,
-    UNIQUE (from_article, to_article),
     PRIMARY KEY (from_article)
 );
