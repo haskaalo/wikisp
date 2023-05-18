@@ -66,7 +66,7 @@ def processArticle(eb: ExitBrake, aq: multiprocessing.Queue, wq: multiprocessing
 
         wq.put((page_title, pages_mentioned, False))
     print("Done processing all article!")
-    sys.exit() # Terminate "sub"-process
+    sys.exit()  # Terminate "sub"-process
 
 
 def writeToDatabase(eb: ExitBrake, wq: multiprocessing.Queue):

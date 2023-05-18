@@ -15,14 +15,13 @@ class DatabaseHelper:
     # Done in batches to increase db performance and not throttle write queue
     # data = [(from, [article1, article 2]), (from, [article1, article2,...])]
     def insertNewEdgesInArticlesLink(self, data: list[tuple]):
-        # Add unvisited articles
         values_query1 = []
         values_query2 = []
         for edges in data:
-            values_query1 += list(map(lambda x: (x, False), edges[1]))
+            values_query1 += list(map(lambda x: (x[0].upper() + x[1:], False), edges[1]))
             values_query2 += list(map(lambda x: (edges[0], x[0].upper() + x[1:]), edges[1]))
 
-        query1 = "INSERT OR IGNORE INTO article (title, visited) VALUES (?, ?)"
+        query1 = "INSERT OR IGNORE INTO article (title, visited) VALUES (?, ?)" # add possibly unvisited articles
         self._cursor.executemany(query1, values_query1)
 
         query2 = "INSERT OR IGNORE INTO article_link_edge_directed (from_article, to_article) " \
