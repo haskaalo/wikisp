@@ -37,6 +37,8 @@ class DatabaseHelper:
         # ===================================================
         # Fixes weirdly inverted redirects in wikipedia dumps
         # ===================================================
+
+        print("REFORMAT: Starting fixing weirdly inverted redirects in wiki dumps")
         query1 = """
         select r.from_article, r.to_article from article a
     inner join redirect r
@@ -47,23 +49,25 @@ class DatabaseHelper:
         self._cursor.execute(query1)
         for toUpdate in self._cursor.fetchall():
             # Check if the inverted already exist
-            self._cursor.execute("SELECT EXISTS(select * from redirect where from_article=? and visited=1)", toUpdate[1])
+            self._cursor.execute("SELECT EXISTS(select * from redirect where from_article=?)", (toUpdate[1],))
 
-            exist = self._cursor.fetchone()
+            exist = self._cursor.fetchone()[0]
 
             if exist:  # right order already exists, therefore delete
-                self._cursor.execute("DELETE FROM redirect WHERE from_article=?", toUpdate[0])
+                self._cursor.execute("DELETE FROM redirect WHERE from_article=?", (toUpdate[0],))
             else: # right order don't exist, so invert
                 self._cursor.execute("""
                 UPDATE redirect
                 SET from_article = to_article, to_article = from_article
                 WHERE from_article=?
-                """, toUpdate[0])
+                """, (toUpdate[0],))
                 print("Inverted - from: " + toUpdate[0] + " to:" + toUpdate[1])
+        print("REFORMAT: Fixing weirdly inverted redirects in wiki dumps DONE")
 
         # ===================================================
         # Delete false redirect loops in wikipedia dumps
         # ===================================================
+        print("REFORMAT: Delete false redirect loops")
         query2 = """
         DELETE FROM redirect
         WHERE from_article IN (
@@ -75,12 +79,14 @@ class DatabaseHelper:
         )
         """
         self._cursor.execute(query2)
+        print("REFORMAT: Delete false redirect loops DONE")
 
         # ===================================================
         # Delete articles that don't exist (red link) or aren't in a valid namespace (Talk:, Help:, Wiki:, etc..)
         # ===================================================
+        print("REFORMAT: Starting deleting articles that don't exist or aren't relevant")
         query3 = "PRAGMA foreign_keys = ON"
-        self.connection.execute(query3) # Enable cascade effects
+        self.connection.execute(query3)  # Enable cascade effects
         cursor = self.connection.cursor()
 
         query4 = """
@@ -96,6 +102,20 @@ class DatabaseHelper:
         """
 
         cursor.execute(query4)
+
+        query5 = """
+        delete from article_link_edge_directed
+        where to_article not in (
+            select to_article
+            from article_link_edge_directed
+            left join article on article.title = to_article
+            where article.title is not null
+        )
+        """
+        cursor.execute(query5)
+
+        print("REFORMAT: Starting deleting articles that don't exist or aren't relevant DONE")
+        print("REFORMAT DONE!")
 
     def commit(self):
         self.connection.commit()

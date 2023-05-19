@@ -183,6 +183,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.reformat_db:
+        print("Reformating database")
         db = database.connect()
         try:
             db.reformatData()
