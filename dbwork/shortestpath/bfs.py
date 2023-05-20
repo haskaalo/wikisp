@@ -15,10 +15,10 @@ class BFS:
             return ""
 
         arrow = " -> "
-        if predecessor[dest] == None:
+        if predecessor[dest] is None:
             arrow = ""
 
-        return dest + arrow + self.printPath(predecessor[dest], predecessor)
+        return self.printPath(predecessor[dest], predecessor) + arrow + dest
 
     def compute(self):
         # STEP 0: Initialisation
@@ -40,7 +40,9 @@ class BFS:
                 if adjacent_article_title in self.visited_articles:
                     continue
                 elif adjacent_article_title == self.dest:
+                    predecessor[adjacent_article_title] = article_title
                     found = True
+                    break
 
                 predecessor[adjacent_article_title] = article_title
                 self.bfs_queue.put(adjacent_article_title)
@@ -49,7 +51,7 @@ class BFS:
             if found:
                 break
 
-        if found is True:
+        if found:
             return self.printPath(self.dest, predecessor)
         else:
             return None
