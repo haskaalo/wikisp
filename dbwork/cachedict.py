@@ -1,7 +1,7 @@
 class Cache:
-    def __init__(self, max=20):
+    def __init__(self, maximum=2000000):
         self.__store = {}
-        self.__max = max
+        self.__max = maximum
 
     def set(self, key, val):
         if key in val:

@@ -46,7 +46,7 @@ class DatabaseHelper:
     where a.visited=1 and exists (select title, visited from article where title=r.to_article and visited=0);
         """
 
-        self._cursor.execute(query1)
+        #self._cursor.execute(query1)
         for toUpdate in self._cursor.fetchall():
             # Check if the inverted already exist
             self._cursor.execute("SELECT EXISTS(select * from redirect where from_article=?)", (toUpdate[1],))
@@ -62,12 +62,12 @@ class DatabaseHelper:
                 WHERE from_article=?
                 """, (toUpdate[0],))
                 print("Inverted - from: " + toUpdate[0] + " to:" + toUpdate[1])
-        print("REFORMAT: Fixing weirdly inverted redirects in wiki dumps DONE")
+        print("REFORMAT: DONE Fixing weirdly inverted redirects in wiki dumps")
 
         # ===================================================
         # Delete false redirect loops in wikipedia dumps
         # ===================================================
-        print("REFORMAT: Delete false redirect loops")
+        print("REFORMAT: Starting delete false redirect loops")
         query2 = """
         DELETE FROM redirect
         WHERE from_article IN (
@@ -77,16 +77,17 @@ class DatabaseHelper:
             where a.visited=1
             and exists (select title, visited from article where title=r.to_article and visited=1)
         )
-        """
-        self._cursor.execute(query2)
-        print("REFORMAT: Delete false redirect loops DONE")
+        """ # Deletes redirect rows where article are both visited, which means they aren't actual redirects
+
+        #self._cursor.execute(query2)
+        print("REFORMAT: DONE Delete false redirect loops")
 
         # ===================================================
-        # Delete articles that don't exist (red link) or aren't in a valid namespace (Talk:, Help:, Wiki:, etc..)
+        # Delete articles aren't in a valid namespace (Talk:, Help:, Wiki:, etc..)
         # ===================================================
-        print("REFORMAT: Starting deleting articles that don't exist or aren't relevant")
+        print("REFORMAT: Starting deleting articles that aren't relevant")
         query3 = "PRAGMA foreign_keys = ON"
-        self.connection.execute(query3)  # Enable cascade effects
+        #self.connection.execute(query3)  # Enable cascade effects
         cursor = self.connection.cursor()
 
         query4 = """
@@ -101,20 +102,51 @@ class DatabaseHelper:
         )
         """
 
-        cursor.execute(query4)
-
+        #cursor.execute(query4)
+        print("REFORMAT: DONE deleting articles that don't exist or aren't relevant")
+        # ===================================================
+        # Delete article edge that don't exist (Done in batches bc db journal is massive if done in a single delete)
+        # ===================================================
+        print("REFORMAT: Starting deleting article edges that don't exist or aren't valid")
         query5 = """
-        delete from article_link_edge_directed
-        where to_article not in (
-            select to_article
-            from article_link_edge_directed
-            left join article on article.title = to_article
-            where article.title is not null
-        )
+select from_article, to_article from article_link_edge_directed aled 
+where not exists (select 1 from article a where a.title = aled.to_article) or aled.from_article = aled.to_article;
         """
-        cursor.execute(query5)
+        #cursor.execute(query5)
+        cursor2 = self.connection.cursor()
 
-        print("REFORMAT: Starting deleting articles that don't exist or aren't relevant DONE")
+        while True:
+            batch = cursor.fetchmany(500)
+            if not batch:
+                break
+            else:
+                cursor2.executemany("DELETE FROM article_link_edge_directed WHERE from_article=? AND to_article=?", batch)
+                self.commit()
+
+        print("REFORMAT: DONE deleting article edges that don't exist or aren't valid")
+
+        # ===================================================
+        # Deleting article links that links to themselves (Often due to a section)
+        # ===================================================
+        print("REFORMAT Starting deleting article links that links to themselves")
+        query = """
+        select aled.from_article, aled.to_article from article_link_edge_directed aled
+            inner join redirect r on r.from_article = aled.to_article
+            where aled.from_article = r.to_article;
+        """
+
+        cursor.execute(query)
+
+        while True:
+            batch = cursor.fetchmany(500)
+            if not batch:
+                break
+            else:
+                print("Starting batch")
+                cursor2.executemany("DELETE FROM article_link_edge_directed WHERE from_article=? AND to_article=?", batch)
+                print("Finished batch")
+                self.commit()
+        print("REFORMAT Done deleting article links that links to themselves")
         print("REFORMAT DONE!")
 
     def commit(self):

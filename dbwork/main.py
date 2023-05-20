@@ -1,4 +1,6 @@
 import argparse
+import time
+
 import shortestpath
 
 if __name__ == "__main__":
@@ -14,7 +16,11 @@ if __name__ == "__main__":
         dest = args.dest[0].upper() + args.dest[1:]
         sp = shortestpath.ShortestPath()
         sp.prepare(source, dest)
-        print("SHORTEST AMOUNT OF CLICK IS: " + str(sp.compute()))
+
+        start_time = time.time()
+        clicks = sp.compute()
+        end_time = time.time()
+        print("SHORTEST AMOUNT OF CLICK IS: " + str(clicks) + " (done in " + str(int(end_time - start_time)) + " seconds)")
 
     else:
         print("Nothing to do")
