@@ -1,8 +1,9 @@
 import database
-import cachedict
+import shortestpath.cachedict as cachedict
 import heapq
 
-class ShortestPath:
+
+class Dijkstra:
 
     def __init__(self):
         self.db = database.connect()
@@ -103,14 +104,15 @@ class ShortestPath:
             while n is not None:
                 toprint = n + " -> " + toprint
                 n = predecessor[n]
-            print(toprint)
+            print(len(self.marked_nodes_set))
             unmarked_nodes_count -= 1
 
             if shortest_new_path[1] == self.dest:
                 return shortest_dist[shortest_new_path[1]]
 
     # Get all articles 1-click away from article title
+    # TODO: Remove this?
     def adjacentArticleNotMarked(self, title: str):
         adjacent_articles = self.db.getAdjacentArticles(title)
 
-        return list(filter(lambda a: a not in self.marked_nodes, adjacent_articles))
+        return adjacent_articles
