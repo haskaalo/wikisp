@@ -34,6 +34,6 @@ if __name__ == "__main__":
             print("\nNO PATH FOUND")
         else:
             print("\n" + path)
-            print("Done in " + str(int(end_time - start_time)) + " seconds!")
+            print("Done in " + "{:.2f}".format(end_time - start_time, 4) + " seconds!")
     else:
         print("Nothing to do")
