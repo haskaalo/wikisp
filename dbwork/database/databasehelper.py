@@ -32,7 +32,7 @@ class DatabaseHelper:
         return self._cursor.fetchone()
 
     def getArticleComponentID(self, title):
-        query = "SELECT component_id FROM article WHERE title=? AND component_id IS NOT NULL"
+        query = "SELECT component_id FROM article WHERE title=? AND component_id IS NOT NULL AND visited=1"
 
         self._cursor.execute(query, (title,))
 
