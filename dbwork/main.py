@@ -1,16 +1,25 @@
 import argparse
+import sys
 import time
 
+import partitiongraph
 import shortestpath
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dijkstra", action="store_true")
     parser.add_argument("--bfs", action="store_true")
-    parser.add_argument("source", type=str, help="Article title 1")
-    parser.add_argument("dest", type=str, help="Article title 2")
+    parser.add_argument("--partition", action="store_true")
+    parser.add_argument("--source", type=str, help="Article title 1")
+    parser.add_argument("--dest", type=str, help="Article title 2")
 
     args = parser.parse_args()
+    if args.partition:
+        partitiongraph.partition()
+        sys.exit(0)
+
+    if args.source is None or args.dest is None:
+        print("No source or dest provided")
 
     if args.dijkstra:
         source = args.source[0].upper() + args.source[1:]

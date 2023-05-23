@@ -78,7 +78,7 @@ class BFS:
 
         path_found = threading.Event()
 
-        num_process = 10
+        num_process = 1
         lock = threading.RLock()
         threads = []
 
