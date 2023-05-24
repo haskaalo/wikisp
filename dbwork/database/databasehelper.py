@@ -49,10 +49,11 @@ class DatabaseHelper:
 
         self._cursor.executemany(query, batch)
 
-    def addArticleComponent(self, component_id: int, start_article_title: str):
+    def addBatchArticleComponents(self, batch: list[(int, str)]):
         query = "INSERT INTO article_component (component_id, starting_article_title) values (?, ?)"
-        self._cursor.execute(query, (component_id, start_article_title))
-        self.addBatchComponentEdge([(component_id, 0, None, start_article_title)])
+        self._cursor.executemany(query, batch)
+
+        self.addBatchComponentEdge(list(map(lambda x: (x[0], 0, None, x[1]), batch)))
 
     def commit(self):
         self.connection.commit()

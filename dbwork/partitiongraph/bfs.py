@@ -5,31 +5,22 @@ import time
 db = database.connect()
 
 
-def componentConnectsBatchWrite(queue):
-    batch = []
-
-    while not queue.empty():
-        # (component_id, connects_to, from_article
-        batch.append(queue.get())
+def componentConnectsBatchWrite(batch: list[tuple]):
 
     try:
         db.addBatchComponentConnects(batch)
         db.commit()
+        batch.clear()
     except Exception as error:
         print("Failed to write to database: {}".format(error))
         db.rollback()
 
 
-def componentBatchWrite(queue: Queue):
-    batch = []
-
-    while not queue.empty():
-        # (component_id, level, title)
-        batch.append(queue.get())
-
+def componentBatchWrite(batch: list[tuple]):
     try:
         db.addBatchComponentEdge(batch)
         db.commit()
+        batch.clear()
     except Exception as error:
         print("Failed to write to database: {}".format(error))
         db.rollback()
@@ -37,8 +28,8 @@ def componentBatchWrite(queue: Queue):
 
 def performBFS(component_id: int, starting_node: str):
     bfs_queue = Queue()
-    comp_write_queue = Queue()
-    comp_connects_write_queue = Queue()
+    comp_write_batch = []
+    comp_connects_write_batch = []
     bfs_queue.put(starting_node)
 
     # value is distance from starting node
@@ -47,10 +38,10 @@ def performBFS(component_id: int, starting_node: str):
     before_count_visited = 1  # For console logging
 
     while not bfs_queue.empty():
-        if comp_write_queue.qsize() >= 500:
-            componentBatchWrite(comp_write_queue)
-        if comp_connects_write_queue.qsize() >= 100:  # TODO: Change once I know how many components after first iter.
-            componentConnectsBatchWrite(comp_connects_write_queue)
+        if len(comp_write_batch) >= 500:
+            componentBatchWrite(comp_write_batch)
+        if len(comp_connects_write_batch) >= 100:
+            componentConnectsBatchWrite(comp_connects_write_batch)
 
         start_time = time.time()  # For logging purpose
 
@@ -66,13 +57,14 @@ def performBFS(component_id: int, starting_node: str):
 
             adj_article_component = db.getArticleComponentID(adj_article_title)
             if adj_article_component is not None:  # Has already been searched (by another bfs component search)
-                comp_connects_write_queue.put((component_id, adj_article_component[0], article_title))
+                comp_connects_write_batch.append((component_id, adj_article_component[0], article_title))
             else:
                 bfs_queue.put(adj_article_title)
-                comp_write_queue.put((component_id, adj_article_level, article_title, adj_article_title))
+                comp_write_batch.append((component_id, adj_article_level, article_title, adj_article_title))
 
-        rate_time = int(time.time() - start_time)
-        if rate_time == 0: rate_time = 1
+        rate_time = time.time() - start_time
+        if rate_time == 0: rate_time = 1 # Yes this happens weirdly sometimes
+
         print("\rGRAPH PARTITION: Visited nodes: " + str(len(visited_articles))
               + " bfs_queue_size: " + str(bfs_queue.qsize())
               + " article visited rate: "
@@ -80,28 +72,44 @@ def performBFS(component_id: int, starting_node: str):
         before_count_visited = len(visited_articles)
 
     # Cleanup queue
-    if not comp_write_queue.empty():
-        componentBatchWrite(comp_write_queue)
+    if len(comp_write_batch) > 0:
+        componentBatchWrite(comp_write_batch)
 
-    if not comp_connects_write_queue.empty():
-        componentConnectsBatchWrite(comp_connects_write_queue)
+    if len(comp_connects_write_batch) > 0:
+        componentConnectsBatchWrite(comp_connects_write_batch)
+
+
+def executeNewPartitionInsertionBatch(batch):
+    try:
+        db.addBatchArticleComponents(batch)
+        db.commit()
+        batch.clear()
+    except Exception as error:
+        print("Failed to write to database: {}".format(error))
+        db.rollback()
 
 
 def partition():
     current_component_id = 0
     starting_node = db.getUnsearchedArticle()
 
+    new_partition_batch = []
     while starting_node is not None:
+        if len(new_partition_batch) >= 500:
+            executeNewPartitionInsertionBatch(new_partition_batch)
+
         print("")
         print("GRAPH PARTITION: Current partition graph ID: " + str(current_component_id))
         print("")
 
-        db.addArticleComponent(current_component_id, starting_node[0])  # Create new component ID
-        db.commit()
+        new_partition_batch.append((current_component_id, starting_node[0]))
         performBFS(current_component_id, starting_node[0])
 
         # Next iteration
         current_component_id += 1
         starting_node = db.getUnsearchedArticle()
+
+    if len(new_partition_batch) > 0:
+        executeNewPartitionInsertionBatch(new_partition_batch)
 
     print("Done partitioning the graph!")
