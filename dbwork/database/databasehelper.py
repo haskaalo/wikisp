@@ -23,10 +23,10 @@ class DatabaseHelper:
 
         return self._cursor.fetchone()[0]
 
-    def getUnsearchedArticle(self):
-        query = "SELECT title FROM article WHERE article.component_id IS NULL LIMIT 1"
+    def getUnsearchedArticle(self, offset: int):
+        query = "SELECT title FROM article WHERE article.component_id IS NULL LIMIT 1 OFFSET ?"
 
-        self._cursor.execute(query)
+        self._cursor.execute(query, (offset,))
 
         # Returns none if no articles are unsearched
         return self._cursor.fetchone()

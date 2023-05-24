@@ -91,7 +91,7 @@ def executeNewPartitionInsertionBatch(batch):
 
 def partition():
     current_component_id = 0
-    starting_node = db.getUnsearchedArticle()
+    starting_node = db.getUnsearchedArticle(0)
 
     new_partition_batch = []
     while starting_node is not None:
@@ -107,7 +107,7 @@ def partition():
 
         # Next iteration
         current_component_id += 1
-        starting_node = db.getUnsearchedArticle()
+        starting_node = db.getUnsearchedArticle(len(new_partition_batch))
 
     if len(new_partition_batch) > 0:
         executeNewPartitionInsertionBatch(new_partition_batch)
