@@ -91,12 +91,12 @@ def executeNewPartitionInsertionBatch(batch):
 
 def partition():
     current_component_id = 0
-    starting_node = db.getUnsearchedArticle(0)
 
     new_partition_batch = []
-    while starting_node is not None:
-        if len(new_partition_batch) >= 500:
-            executeNewPartitionInsertionBatch(new_partition_batch)
+    unreachable_articles = db.getUnreachedArticles()
+
+    while len(unreachable_articles) > 0:
+        starting_node = unreachable_articles.pop()
 
         print("")
         print("GRAPH PARTITION: Current partition graph ID: " + str(current_component_id))
@@ -106,8 +106,10 @@ def partition():
         performBFS(current_component_id, starting_node[0])
 
         # Next iteration
+        if len(unreachable_articles) == 0:
+            executeNewPartitionInsertionBatch(new_partition_batch)
+            unreachable_articles = db.getUnreachedArticles()
         current_component_id += 1
-        starting_node = db.getUnsearchedArticle(len(new_partition_batch))
 
     if len(new_partition_batch) > 0:
         executeNewPartitionInsertionBatch(new_partition_batch)
