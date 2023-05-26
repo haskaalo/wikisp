@@ -24,7 +24,7 @@ class DatabaseHelper:
         return self._cursor.fetchone()[0]
 
     def getUnreachedArticles(self):
-        query = "SELECT title FROM article WHERE article.component_id IS NULL LIMIT 1000"
+        query = "SELECT title FROM article WHERE article.component_id IS NULL AND visited=1 LIMIT 1000"
 
         self._cursor.execute(query)
 
