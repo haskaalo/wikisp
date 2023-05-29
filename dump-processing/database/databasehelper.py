@@ -6,11 +6,26 @@ class DatabaseHelper:
         self._cursor = connection.cursor()
         self.connection = connection
 
-    def insertNewArticles(self, articles_title: list[str], visited: bool):
+    def insertNewArticles(self, articles_titles: list[str], visited: bool):
         query = "INSERT INTO article (title, visited) " \
-                "VALUES (?, ?) ON CONFLICT(title) DO UPDATE set visited=1"
+                "VALUES (?, ?)"
 
-        self._cursor.executemany(query, list(map(lambda x: (x, visited), articles_title)))
+        self._cursor.executemany(query, list(map(lambda x: (x, visited), articles_titles)))
+
+    def insertNewArticle(self, article_title: str, visited: bool):
+        query = "INSERT INTO article (title, visited) " \
+                "VALUES (?, ?) returning id"
+
+        self._cursor.execute(query, (article_title, visited))
+
+        return self._cursor.fetchone()
+
+    def getArticleIDFromTitle(self, title: str):
+        query = "SELECT id FROM article WHERE title=? LIMIT 1"
+
+        self._cursor.execute(query, (title,))
+
+        return self._cursor.fetchone()
 
     # Done in batches to increase db performance and not throttle write queue
     # data = [(from, [article1, article 2]), (from, [article1, article2,...])]
@@ -30,7 +45,7 @@ class DatabaseHelper:
         self._cursor.executemany(query2, values_query2)
 
     def insertNewRedirects(self, batch: list[tuple]):
-        query = "INSERT INTO redirect (from_article, to_article) VALUES (?, ?)"
+        query = "INSERT OR IGNORE INTO redirect (from_article, to_article) VALUES (?, ?)"
         self._cursor.executemany(query, batch)
 
     def reformatData(self):

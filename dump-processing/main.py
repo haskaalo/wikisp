@@ -13,6 +13,7 @@ from wikireader import WikiReader
 import csv
 from datetime import timedelta
 from exitbrake import ExitBrake
+from csvutils import csvFileObject, parseCSV
 
 
 # This functions display current information about the processing of Wikipedia dumps
@@ -71,11 +72,7 @@ def processArticle(page_text: str):
 
 # This (main) functions processes information the Wikipedia reader (WikiReader) has read
 def writeToLocal(pq: Queue, eb: ExitBrake):
-    out_dir = os.environ.get('OUT_DIR')
-
-    article_csv = open(os.path.join(out_dir, 'article.csv'), 'w', newline='', encoding='utf-8')
-    redirect_csv = open(os.path.join(out_dir, 'redirect.csv'), 'w', newline='', encoding='utf-8')
-    pagesmentioned_csv = open(os.path.join(out_dir, 'pagesmentioned.csv'), 'w', newline='', encoding='utf-8')
+    article_csv, redirect_csv, pagesmentioned_csv = csvFileObject('w')
 
     article_w = csv.writer(article_csv, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
     redirect_w = csv.writer(redirect_csv, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
@@ -94,6 +91,7 @@ def writeToLocal(pq: Queue, eb: ExitBrake):
     article_csv.close()
     redirect_csv.close()
     pagesmentioned_csv.close()
+
 
 def main():
     # This is a queue that can dequeue and enqueue items in different threads? (in a synchronized way)
@@ -129,6 +127,7 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--reformat_db", action="store_true")
+    parser.add_argument("--csvtodb", action="store_true")
 
     args = parser.parse_args()
     if args.reformat_db:
@@ -141,5 +140,7 @@ if __name__ == "__main__":
             print("Failed to write to database: {}".format(e))
             db.rollback()
         db.close()
+    elif args.csvtodb:
+        parseCSV()
     else:
         main()

@@ -1,13 +1,15 @@
 --PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS article (
-    title varblob(256) NOT NULL,
+    id INTEGER PRIMARY KEY,
+    title varblob(256) NOT NULL UNIQUE,
     visited boolean NOT NULL,
     component_id int,
     component_level int,
-    predecessor varblob(256) REFERENCES article(title),
-    PRIMARY KEY (title)
+    predecessor varblob(256) REFERENCES article(title)
 );
+
+CREATE INDEX IF NOT EXISTS idx_article_title ON article(title);
 
 CREATE TABLE IF NOT EXISTS article_component (
     component_id int not null,
@@ -37,8 +39,10 @@ CREATE TABLE IF NOT EXISTS article_link_edge_directed (
 );
 
 CREATE TABLE IF NOT EXISTS redirect (
-    from_article varblob(256) NOT NULL,
-    to_article varblob(256) NOT NULL,
+    from_article integer NOT NULL,
+    to_article integer NOT NULL,
+    FOREIGN KEY (from_article) REFERENCES article(title) ON DELETE CASCADE,
+    FOREIGN KEY (to_article) REFERENCES article(title) ON DELETE CASCADE,
     PRIMARY KEY (from_article)
 );
 

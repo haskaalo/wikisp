@@ -59,3 +59,4 @@ class DatabaseHelper:
 
     def rollback(self):
         self.connection.rollback()
+
