@@ -43,7 +43,7 @@ class DatabaseHelper:
         select r.from_article, r.to_article from article a
     inner join redirect r
     on r.from_article = a.title
-    where a.visited=1 and exists (select title, visited from article where title=r.to_article and visited=0);
+    where a.visited=1 and exists (select title, visited from article where title=r.to_article and visited=0)
         """
 
         #self._cursor.execute(query1)

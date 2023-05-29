@@ -41,3 +41,5 @@ CREATE TABLE IF NOT EXISTS redirect (
     to_article varblob(256) NOT NULL,
     PRIMARY KEY (from_article)
 );
+
+-- CREATE INDEX unreached_article_idx ON article (component_id, visited) WHERE component_id is null and visited=1;

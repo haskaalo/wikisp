@@ -67,7 +67,7 @@ class WikiReader(xml.sax.ContentHandler):
             self.page_text += content
 
         elif self.tag_stack[-1] == "title":
-            self.page_title += content
+            self.page_title += content[0].upper() + content[1:]
 
         elif self.tag_stack[-1] == "ns":
             self.namespace = int(content)

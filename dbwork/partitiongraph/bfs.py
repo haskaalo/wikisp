@@ -79,39 +79,21 @@ def performBFS(component_id: int, starting_node: str):
         componentConnectsBatchWrite(comp_connects_write_batch)
 
 
-def executeNewPartitionInsertionBatch(batch):
-    try:
-        db.addBatchArticleComponents(batch)
-        db.commit()
-        batch.clear()
-    except Exception as error:
-        print("Failed to write to database: {}".format(error))
-        db.rollback()
-
-
 def partition():
     current_component_id = 0
+    starting_node = db.getUnreachedArticle()
 
-    new_partition_batch = []
-    unreachable_articles = db.getUnreachedArticles()
-
-    while len(unreachable_articles) > 0:
-        starting_node = unreachable_articles.pop()
-
+    while starting_node is not None:
         print("")
         print("GRAPH PARTITION: Current partition graph ID: " + str(current_component_id))
         print("")
 
-        new_partition_batch.append((current_component_id, starting_node[0]))
+        db.addArticleComponent((current_component_id, starting_node[0]))
+        db.commit()
         performBFS(current_component_id, starting_node[0])
 
         # Next iteration
-        if len(unreachable_articles) == 0:
-            executeNewPartitionInsertionBatch(new_partition_batch)
-            unreachable_articles = db.getUnreachedArticles()
+        starting_node = db.getUnreachedArticle()
         current_component_id += 1
-
-    if len(new_partition_batch) > 0:
-        executeNewPartitionInsertionBatch(new_partition_batch)
 
     print("Done partitioning the graph!")

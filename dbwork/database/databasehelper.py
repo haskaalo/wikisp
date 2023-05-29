@@ -23,12 +23,12 @@ class DatabaseHelper:
 
         return self._cursor.fetchone()[0]
 
-    def getUnreachedArticles(self):
-        query = "SELECT title FROM article WHERE article.component_id IS NULL AND visited=1 LIMIT 1000"
+    def getUnreachedArticle(self):
+        query = "SELECT title FROM article WHERE article.component_id IS NULL AND visited=1 LIMIT 1"
 
         self._cursor.execute(query)
 
-        return self._cursor.fetchall()
+        return self._cursor.fetchone()
 
     def getArticleComponentID(self, title):
         query = "SELECT component_id FROM article WHERE title=? AND component_id IS NOT NULL AND visited=1"
@@ -48,11 +48,11 @@ class DatabaseHelper:
 
         self._cursor.executemany(query, batch)
 
-    def addBatchArticleComponents(self, batch: list[(int, str)]):
+    def addArticleComponent(self, values: (int, str)):
         query = "INSERT INTO article_component (component_id, starting_article_title) values (?, ?)"
-        self._cursor.executemany(query, batch)
 
-        self.addBatchComponentEdge(list(map(lambda x: (x[0], 0, None, x[1]), batch)))
+        self._cursor.execute(query, values)
+        self.addBatchComponentEdge([(values[0], 0, None, values[1])])
 
     def commit(self):
         self.connection.commit()
