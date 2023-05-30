@@ -27,9 +27,21 @@ def writeArticleBatch(batch, visited, db: database.databasehelper.DatabaseHelper
         db.rollback()
         sys.exit()
 
+
 def writeRedirectBatch(batch, db: database.databasehelper.DatabaseHelper):
     try:
         db.insertNewRedirects(batch)
+        db.commit()
+        batch.clear()
+    except Exception as error:
+        print("Failed to write to database: {}".format(error))
+        db.rollback()
+        sys.exit()
+
+
+def writePagesMentionedBatch(batch, db: database.databasehelper.DatabaseHelper):
+    try:
+        db.insertNewEdgesInArticlesLink(batch)
         db.commit()
         batch.clear()
     except Exception as error:
@@ -50,7 +62,7 @@ def parseCSV():
     article_r = csv.reader(article_csv, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
 
     article_batch = []
-    for i, row in enumerate(article_r):
+    for i, row in enumerate([]):
         article_title = row[0]
 
         article_batch.append(article_title)
@@ -71,7 +83,7 @@ def parseCSV():
     redirect_r = csv.reader(redirect_csv, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
     redirect_batch = []
 
-    for i, row in enumerate(redirect_r):
+    for i, row in enumerate([]):
         print("\r{0}: Inserting redirect no. {1}".format(
             timedelta(seconds=(time.time() - starting_time)), i),
             end='')
@@ -90,3 +102,48 @@ def parseCSV():
 
     if len(redirect_batch) > 0:
         writeRedirectBatch(redirect_batch, db)
+
+    #
+    # Reformating redirects
+    #
+    # Starting reformating redirects
+    """
+    print("Reformating redirects")
+    try:
+        db.reformatData()
+        db.commit()
+    except Exception as e:
+        print("Failed to write to database: {}".format(e))
+        db.rollback()
+        return
+    """
+    #
+    # Insert article edges
+    #
+    print("Starting inserting article page mentionned...")
+    pagesmentioned_r = csv.reader(pagesmentioned_csv, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
+    pagesmentioned_batch = []
+
+    for i, row in enumerate(pagesmentioned_r):
+        print("\r{0}: Inserting page mentionned no. {1}".format(
+            timedelta(seconds=(time.time() - starting_time)), i),
+            end='')
+
+        from_id = db.getArticleIDFromTitle(row[0])
+        to_id = db.getArticleIDFromTitle(row[1])
+
+        if from_id is None:
+            print("Weirdly {0} is not in database".format(from_id))
+            return
+        elif to_id is None:  # Mentioned page that doesn't exist or is not in a valid namespace
+            continue
+
+        pagesmentioned_batch.append((from_id[0], to_id[0]))
+
+        if len(pagesmentioned_batch) >= 500:
+            writePagesMentionedBatch(pagesmentioned_batch, db)
+
+    if len(pagesmentioned_batch) > 0:
+        writePagesMentionedBatch(pagesmentioned_batch, db)
+
+    print("DONE!!!!!")

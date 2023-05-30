@@ -119,9 +119,7 @@ def main():
     # Wait for articles in queues to finish
     eb.brake()
     wlocal_thread.join()
-    print("Bye bye!")
     sys.exit(0)
-
 
 
 if __name__ == "__main__":
