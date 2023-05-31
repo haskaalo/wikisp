@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS article (
 );
 
 CREATE INDEX IF NOT EXISTS idx_article_title ON article(title);
+CREATE INDEX unreached_article_idx ON article (component_id, visited) WHERE component_id is null and visited=1;
 
 CREATE TABLE IF NOT EXISTS article_component (
     component_id int not null,
@@ -45,5 +46,3 @@ CREATE TABLE IF NOT EXISTS redirect (
     FOREIGN KEY (to_article) REFERENCES article(title) ON DELETE CASCADE,
     PRIMARY KEY (from_article)
 );
-
--- CREATE INDEX unreached_article_idx ON article (component_id, visited) WHERE component_id is null and visited=1;

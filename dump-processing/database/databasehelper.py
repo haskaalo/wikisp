@@ -115,6 +115,33 @@ class DatabaseHelper:
         redirects_to_del = self._cursor.fetchall()
         self._cursor.executemany("DELETE FROM article WHERE id=? OR id=? AND visited=0", redirects_to_del)
         print("REFORMAT: DONE deleting redirects that leads to nowhere")
+
+        # ==================================================
+        # Replacing all redirects with the final destination
+        # ==================================================
+        print("REFORMAT: Starting replacing all redirects with the final destination")
+
+        query = """
+        UPDATE redirect AS r
+        SET to_article=ft.final_destination
+        FROM (
+                WITH RECURSIVE cte(from_article, to_article, final_destination) AS (
+                SELECT from_article, to_article, to_article as final_destination
+                FROM redirect
+                UNION ALL
+                SELECT cte.from_article, redirect.to_article, redirect.to_article as final_destination
+                FROM cte
+                JOIN redirect ON cte.final_destination = redirect.from_article
+                )
+                SELECT from_article, final_destination
+                FROM cte
+                WHERE final_destination NOT IN (select from_article from redirect)
+        ) as ft
+        WHERE r.from_article=ft.from_article
+        """
+        self._cursor.execute(query)
+
+        print("REFORMAT: DONE replacing all redirects with the final destination")
         print("REFORMAT DONE!")
 
     def commit(self):

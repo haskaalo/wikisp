@@ -2,7 +2,7 @@ import database
 from queue import Queue
 import time
 
-db = database.connect()
+db = database.connectPartition()
 
 
 def componentConnectsBatchWrite(batch: list[tuple]):
@@ -43,32 +43,27 @@ def performBFS(component_id: int, starting_node: str):
         if len(comp_connects_write_batch) >= 100:
             componentConnectsBatchWrite(comp_connects_write_batch)
 
-        start_time = time.time()  # For logging purpose
+        article_id = bfs_queue.get()
+        adj_articles = db.getAdjacentArticles(article_id)
 
-        article_title = bfs_queue.get()
-        adj_articles = db.getAdjacentArticles(article_title)
-
-        for adj_article_title in adj_articles:
-            if adj_article_title in visited_articles:
+        for adj_article_id in adj_articles:
+            if adj_article_id in visited_articles:
                 continue
 
-            adj_article_level = visited_articles[article_title] + 1
-            visited_articles[adj_article_title] = adj_article_level
+            adj_article_level = visited_articles[article_id] + 1
+            visited_articles[adj_article_id] = adj_article_level
 
-            adj_article_component = db.getArticleComponentID(adj_article_title)
+            adj_article_component = db.getArticleComponentID(adj_article_id)
             if adj_article_component is not None:  # Has already been searched (by another bfs component search)
-                comp_connects_write_batch.append((component_id, adj_article_component[0], article_title))
+                comp_connects_write_batch.append((component_id, adj_article_component[0], article_id))
             else:
-                bfs_queue.put(adj_article_title)
-                comp_write_batch.append((component_id, adj_article_level, article_title, adj_article_title))
-
-        rate_time = time.time() - start_time
-        if rate_time == 0: rate_time = 1 # Yes this happens weirdly sometimes
+                bfs_queue.put(adj_article_id)
+                comp_write_batch.append((component_id, adj_article_level, article_id, adj_article_id))
 
         print("\rGRAPH PARTITION: Visited nodes: " + str(len(visited_articles))
               + " bfs_queue_size: " + str(bfs_queue.qsize())
               + " article visited rate: "
-              + str((len(visited_articles) - before_count_visited) // rate_time), end='')
+              + str(len(visited_articles) - before_count_visited), end='')
         before_count_visited = len(visited_articles)
 
     # Cleanup queue
@@ -79,7 +74,7 @@ def performBFS(component_id: int, starting_node: str):
         componentConnectsBatchWrite(comp_connects_write_batch)
 
 
-def partition():
+def performPartition():
     current_component_id = 0
     starting_node = db.getUnreachedArticle()
 
@@ -89,7 +84,6 @@ def partition():
         print("")
 
         db.addArticleComponent((current_component_id, starting_node[0]))
-        db.commit()
         performBFS(current_component_id, starting_node[0])
 
         # Next iteration
@@ -97,3 +91,4 @@ def partition():
         current_component_id += 1
 
     print("Done partitioning the graph!")
+    db.commit()

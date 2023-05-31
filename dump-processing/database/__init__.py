@@ -1,4 +1,5 @@
 import database.databasehelper as dh
+import database.partitionhelper as ph
 import sqlite3
 import os
 
@@ -18,5 +19,15 @@ def connect():
 
     try:
         return dh.DatabaseHelper(db)
+    except Exception as e:
+        raise e
+
+
+def connectPartition():
+
+    db = sqlite3.connect(os.environ.get("SQLITE3_DB_PATH") or "wikigraph.db")
+
+    try:
+        return ph.PartitionDatabaseHelper(db)
     except Exception as e:
         raise e

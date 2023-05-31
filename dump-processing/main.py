@@ -1,4 +1,3 @@
-import multiprocessing
 import time
 import bz2
 import os
@@ -9,6 +8,7 @@ from queue import Queue
 import argparse
 import sys
 import database
+import partition
 from wikireader import WikiReader
 import csv
 from datetime import timedelta
@@ -126,8 +126,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--reformat_db", action="store_true")
     parser.add_argument("--csvtodb", action="store_true")
-
+    parser.add_argument("--partition", action="store_true")
     args = parser.parse_args()
+
     if args.reformat_db:
         print("Reformating database")
         db = database.connect()
@@ -140,5 +141,7 @@ if __name__ == "__main__":
         db.close()
     elif args.csvtodb:
         parseCSV()
+    elif args.partition:
+        partition.performPartition()
     else:
         main()

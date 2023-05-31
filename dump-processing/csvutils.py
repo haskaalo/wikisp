@@ -62,7 +62,7 @@ def parseCSV():
     article_r = csv.reader(article_csv, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
 
     article_batch = []
-    for i, row in enumerate([]):
+    for i, row in enumerate(article_r):
         article_title = row[0]
 
         article_batch.append(article_title)
@@ -83,7 +83,7 @@ def parseCSV():
     redirect_r = csv.reader(redirect_csv, delimiter=' ', quoting=csv.QUOTE_MINIMAL)
     redirect_batch = []
 
-    for i, row in enumerate([]):
+    for i, row in enumerate(redirect_r):
         print("\r{0}: Inserting redirect no. {1}".format(
             timedelta(seconds=(time.time() - starting_time)), i),
             end='')
@@ -133,7 +133,7 @@ def parseCSV():
         to_id = db.getArticleIDFromTitle(row[1])
 
         if from_id is None:
-            print("Weirdly {0} is not in database".format(from_id))
+            print("Weirdly {0} is not in database".format(row[0]))
             return
         elif to_id is None:  # Mentioned page that doesn't exist or is not in a valid namespace
             continue
