@@ -107,7 +107,6 @@ def parseCSV():
     # Reformating redirects
     #
     # Starting reformating redirects
-    """
     print("Reformating redirects")
     try:
         db.reformatData()
@@ -116,7 +115,7 @@ def parseCSV():
         print("Failed to write to database: {}".format(e))
         db.rollback()
         return
-    """
+
     #
     # Insert article edges
     #
