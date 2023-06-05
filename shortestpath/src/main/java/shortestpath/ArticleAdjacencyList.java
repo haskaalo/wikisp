@@ -1,7 +1,11 @@
 package shortestpath;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import shortestpath.database.DatabaseHelper;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.*;
@@ -53,6 +57,28 @@ public class ArticleAdjacencyList implements Serializable {
                 visitedArticles.add(adjacentArticleID);
                 bfsQueue.add(adjacentArticleID);
             }
+        }
+    }
+
+    public static ArticleAdjacencyList loadArticleAdjacencyList() {
+        try {
+            Kryo kryo = new Kryo();
+            kryo.register(ArticleAdjacencyList.class);
+            kryo.register(HashMap.class);
+            kryo.register(ArrayList.class);
+
+            String adjacencyMapPath = System.getenv("ADJACENCY_LIST_PATH");
+            if (adjacencyMapPath != null) {
+                Input input = new Input(new FileInputStream(adjacencyMapPath));
+                ArticleAdjacencyList result = kryo.readObject(input, ArticleAdjacencyList.class);
+                input.close();
+
+                return result;
+            } else {
+                throw new RuntimeException("Called loadArticleAdjacencyList while serialized file don't exist");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,13 +1,17 @@
 package shortestpath;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import shortestpath.database.DatabaseHelper;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.*;
 
 public class SimpleBFS {
     private DatabaseHelper db = DatabaseHelper.connect();
-    private HashMap<Integer, ArrayList<Integer>> adjacencyMap = new HashMap<>();
+    private ArticleAdjacencyList adjacencyMap = ArticleAdjacencyList.loadArticleAdjacencyList();
 
     private String predecessorPath(HashMap<Integer, Integer> predecessor, int dest) {
         if (dest == -1) return "";
@@ -29,7 +33,7 @@ public class SimpleBFS {
         while (!bfsQueue.isEmpty()) {
             int articleID = bfsQueue.poll();
 
-            ArrayList<Integer> adjacentArticlesID = this.db.getAdjacentArticles(articleID, true);
+            ArrayList<Integer> adjacentArticlesID = this.adjacencyMap.get(articleID);
 
             System.out.print("\r"+predecessor.size() + " " + bfsQueue.size());
 

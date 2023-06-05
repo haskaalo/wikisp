@@ -5,19 +5,24 @@ import shortestpath.database.ArticleInfo;
 import shortestpath.database.DatabaseHelper;
 import java.io.FileOutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.esotericsoftware.kryo.io.Output;
 
 public class Main {
     public static void main(String[] args) {
         if (args.length > 0 && args[0].equals("serialize-list")) {
+            Kryo kryo = new Kryo();
+            kryo.register(ArticleAdjacencyList.class);
+            kryo.register(HashMap.class);
+            kryo.register(ArrayList.class);
+
             ArticleAdjacencyList adjacencyList = new ArticleAdjacencyList();
             adjacencyList.prepare();
             try {
                 String destination = System.getenv("ADJACENCY_LIST_PATH");
                 System.out.println("SERIALIZATION: Starting writing to disk at: " + destination);
-
-                Kryo kryo = new Kryo();
-                kryo.register(ArticleAdjacencyList.class);
 
                 FileOutputStream fo = new FileOutputStream(destination);
                 Output out = new Output(fo);
@@ -30,6 +35,7 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            return;
         }
 
         if (args.length != 2) {
@@ -52,7 +58,9 @@ public class Main {
                 return;
             }
 
+            System.out.println("LOADING SERIALIZED DATA");
             SimpleBFS bfs = new SimpleBFS();
+            System.out.println("DONE LOADING SERIALIZED DATA");
             ArticleComponentExplorer expl = new ArticleComponentExplorer();
             if (info1.componentID != info2.componentID && !expl.existPossiblePath(info1.componentID, info2.componentID)) {
                 System.out.println("NO PATH POSSIBLE!");
