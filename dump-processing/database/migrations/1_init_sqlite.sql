@@ -39,6 +39,9 @@ CREATE TABLE IF NOT EXISTS article_link_edge_directed (
     UNIQUE (from_article, to_article)
 );
 
+CREATE INDEX IF NOT EXISTS idx_article_outbound ON article_link_edge_directed(from_article);
+CREATE INDEX IF NOT EXISTS idx_article_inbound ON article_link_edge_directed(to_article);
+
 CREATE TABLE IF NOT EXISTS redirect (
     from_article integer NOT NULL,
     to_article integer NOT NULL,

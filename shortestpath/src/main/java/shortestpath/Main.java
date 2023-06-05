@@ -1,4 +1,5 @@
 package shortestpath;
+import shortestpath.database.ArticleInfo;
 import shortestpath.database.DatabaseHelper;
 import java.sql.SQLException;
 
@@ -13,20 +14,26 @@ public class Main {
         try {
             db = DatabaseHelper.connect();
 
-            int id1 = db.getArticleIDByTitle(args[0]);
-            if (id1 == -1) {
+            ArticleInfo info1 = db.getArticleInfoByTitle(args[0]);
+            if (info1 == null) {
                 System.out.println(String.format("\"%s\" is not a valid article name", args[0]));
                 return;
             }
-            int id2 = db.getArticleIDByTitle(args[1]);
-            if (id2 == -1) {
+            ArticleInfo info2 = db.getArticleInfoByTitle(args[1]);
+            if (info2 == null) {
                 System.out.println(String.format("\"%s\" is not a valid article name", args[1]));
                 return;
             }
 
             SimpleBFS bfs = new SimpleBFS();
+            ArticleComponentExplorer expl = new ArticleComponentExplorer();
+            if (info1.componentID != info2.componentID && !expl.existPossiblePath(info1.componentID, info2.componentID)) {
+                System.out.println("NO PATH POSSIBLE!");
+                return;
+            }
+
             long start = System.nanoTime();
-            System.out.println(bfs.compute(id1, id2));
+            System.out.println(bfs.compute(info1.id, info2.id));
             long end = System.nanoTime();
 
             System.out.println(String.format("Done in: %.2f", (end - start) / Math.pow(10, 9)));

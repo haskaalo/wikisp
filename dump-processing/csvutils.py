@@ -6,6 +6,7 @@ import database
 import time
 from datetime import timedelta
 
+
 # mode = w | r
 def csvFileObject(mode: str):
     out_dir = os.environ.get('OUT_DIR')

@@ -28,7 +28,7 @@ public class SimpleBFS {
         while (!bfsQueue.isEmpty()) {
             int articleID = bfsQueue.poll();
 
-            ArrayList<Integer> adjacentArticlesID = this.db.getAdjacentArticles(articleID);
+            ArrayList<Integer> adjacentArticlesID = this.db.getAdjacentArticles(articleID, true);
 
             System.out.print("\r"+predecessor.size() + " " + bfsQueue.size());
 
@@ -41,7 +41,6 @@ public class SimpleBFS {
                     return predecessorPath(predecessor, article2_id);
                 }
 
-                // TODO: Fix queue + predecessor length
                 bfsQueue.add(adjacentArticleID);
             }
         }
