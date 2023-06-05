@@ -1,10 +1,31 @@
 package shortestpath;
 import shortestpath.database.ArticleInfo;
 import shortestpath.database.DatabaseHelper;
+import java.io.FileOutputStream;
 import java.sql.SQLException;
+import com.esotericsoftware.kryo.io.Output;
 
 public class Main {
     public static void main(String[] args) {
+        if (args.length > 0 && args[0].equals("serialize-list")) {
+            ArticleAdjacencyList adjacencyList = new ArticleAdjacencyList();
+            adjacencyList.prepare();
+            try {
+                String destination = System.getenv("ADJACENCY_LIST_PATH");
+                System.out.println("SERIALIZATION: Starting writing to disk at: " + destination);
+
+                FileOutputStream fo = new FileOutputStream(destination);
+                Output out = new Output(fo);
+                out.writeObject(adjacencyList);
+
+                out.close();
+                fo.close();
+                System.out.println("SERIALIZATION: Done! ");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         if (args.length != 2) {
             System.out.println("Invalid parameter length");
             return;

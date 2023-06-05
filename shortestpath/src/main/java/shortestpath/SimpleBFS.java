@@ -7,6 +7,7 @@ import java.util.*;
 
 public class SimpleBFS {
     private DatabaseHelper db = DatabaseHelper.connect();
+    private HashMap<Integer, ArrayList<Integer>> adjacencyMap = new HashMap<>();
 
     private String predecessorPath(HashMap<Integer, Integer> predecessor, int dest) {
         if (dest == -1) return "";

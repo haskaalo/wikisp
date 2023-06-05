@@ -107,4 +107,22 @@ public class DatabaseHelper {
             throw new RuntimeException(e);
         }
     }
+
+    public ArrayList<Integer> getArticleIDList() {
+        String query = "SELECT id FROM article where visited=1";
+
+        try {
+            Statement stmt = this.conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            ArrayList<Integer> listResult = new ArrayList<>();
+
+            while (rs.next()) {
+                listResult.add(rs.getInt("id"));
+            }
+
+            return listResult;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
