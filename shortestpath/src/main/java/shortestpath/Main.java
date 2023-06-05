@@ -1,4 +1,6 @@
 package shortestpath;
+
+import com.esotericsoftware.kryo.Kryo;
 import shortestpath.database.ArticleInfo;
 import shortestpath.database.DatabaseHelper;
 import java.io.FileOutputStream;
@@ -14,9 +16,13 @@ public class Main {
                 String destination = System.getenv("ADJACENCY_LIST_PATH");
                 System.out.println("SERIALIZATION: Starting writing to disk at: " + destination);
 
+                Kryo kryo = new Kryo();
+                kryo.register(ArticleAdjacencyList.class);
+
                 FileOutputStream fo = new FileOutputStream(destination);
                 Output out = new Output(fo);
-                out.writeObject(adjacencyList);
+
+                kryo.writeObject(out, adjacencyList);
 
                 out.close();
                 fo.close();
