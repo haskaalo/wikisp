@@ -68,7 +68,7 @@ public class Main {
             }
 
             long start = System.nanoTime();
-            System.out.println(bfs.compute(info1.id, info2.id));
+            System.out.println("\n" + bfs.compute(info1.id, info2.id));
             long end = System.nanoTime();
 
             System.out.println(String.format("Done in: %.2f", (end - start) / Math.pow(10, 9)));
