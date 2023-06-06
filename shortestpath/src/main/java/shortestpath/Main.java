@@ -10,9 +10,12 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        if (args.length > 0 && args[0].equals("serialize-list")) {
-            ArticleAdjacencyList adjacencyList = new ArticleAdjacencyList();
-            adjacencyList.prepare();
+        if (args.length > 0 && args[0].equals("serialize")) {
+            ArticleAdjacencyList articleAdjacencyList = new ArticleAdjacencyList();
+            ComponentAdjacencyList componentAdjacencyList = new ComponentAdjacencyList();
+
+            articleAdjacencyList.prepare();
+            componentAdjacencyList.prepare();
             return;
         }
 
@@ -38,8 +41,9 @@ public class Main {
 
             System.out.println("LOADING SERIALIZED DATA");
             SimpleBFS bfs = new SimpleBFS();
+            ComponentAdjacencyList expl = ComponentAdjacencyList.deserialize();
             System.out.println("DONE LOADING SERIALIZED DATA");
-            ArticleComponentExplorer expl = new ArticleComponentExplorer();
+
             if (info1.componentID != info2.componentID && !expl.existPossiblePath(info1.componentID, info2.componentID)) {
                 System.out.println("NO PATH POSSIBLE!");
                 return;
@@ -48,6 +52,11 @@ public class Main {
             long start = System.nanoTime();
             ArrayList<ArticleID> result = bfs.compute(info1.id, info2.id);
             long end = System.nanoTime();
+
+            if (result == null) {
+                System.out.println("NO PATH POSSIBLE!!!");
+                return;
+            }
 
             List<String> resultFinalString = result
                     .stream().map(dest -> db.getArticleTitleByID(dest.finalID)).toList();

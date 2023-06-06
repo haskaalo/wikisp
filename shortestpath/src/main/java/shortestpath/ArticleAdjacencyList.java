@@ -7,6 +7,7 @@ import shortestpath.database.ArticleID;
 import shortestpath.database.DatabaseHelper;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -41,7 +42,8 @@ public class ArticleAdjacencyList implements Serializable {
             }
         }
 
-        String destination = System.getenv("ADJACENCY_LIST_PATH");
+        String destination = Paths.get(System.getenv("ADJACENCY_LIST_PATH"),
+                        "wdg_article_map.data").toString();;
         System.out.println("SERIALIZATION: Starting writing to disk at: " + destination);
 
         Kryo kryo = new Kryo();
@@ -99,16 +101,13 @@ public class ArticleAdjacencyList implements Serializable {
             kryo.register(HashMap.class);
             kryo.register(ArticleAdjacencyList.class);
 
-            String adjacencyMapPath = System.getenv("ADJACENCY_LIST_PATH");
-            if (adjacencyMapPath != null) {
-                Input input = new Input(new FileInputStream(adjacencyMapPath));
-                HashMap<Integer, ArrayList<ArticleID>> listResult = kryo.readObject(input, HashMap.class);
-                input.close();
+            String adjacencyMapPath = Paths.get(System.getenv("ADJACENCY_LIST_PATH"), "wdg_article_map.data")
+                    .toString();
+            Input input = new Input(new FileInputStream(adjacencyMapPath));
+            HashMap<Integer, ArrayList<ArticleID>> listResult = kryo.readObject(input, HashMap.class);
+            input.close();
 
-                return new ArticleAdjacencyList(listResult);
-            } else {
-                throw new RuntimeException("Called loadArticleAdjacencyList while serialized file don't exist");
-            }
+            return new ArticleAdjacencyList(listResult);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

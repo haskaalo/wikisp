@@ -126,4 +126,22 @@ public class DatabaseHelper {
             throw new RuntimeException(e);
         }
     }
+
+    public ArrayList<Integer> getArticleComponentIDList() {
+        String query = "SELECT component_id FROM article_component";
+
+        try {
+            Statement stmt = this.conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            ArrayList<Integer> listResult = new ArrayList<>();
+
+            while (rs.next()) {
+                listResult.add(rs.getInt("component_id"));
+            }
+
+            return listResult;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
