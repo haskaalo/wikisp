@@ -1,55 +1,53 @@
 package shortestpath;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
+import shortestpath.database.ArticleID;
 import shortestpath.database.DatabaseHelper;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.*;
 
 public class SimpleBFS {
     private DatabaseHelper db = DatabaseHelper.connect();
-    private ArticleAdjacencyList adjacencyMap = ArticleAdjacencyList.loadArticleAdjacencyList();
+    private ArticleAdjacencyList adjacencyMap = ArticleAdjacencyList.deserialize();
 
-    private String predecessorPath(HashMap<Integer, Integer> predecessor, int dest) {
-        if (dest == -1) return "";
+    private ArrayList<ArticleID> predecessorPath(HashMap<Integer, ArticleID> predecessor, ArticleID dest) {
+        ArrayList<ArticleID> result = new ArrayList<>();
+        while (dest != null) {
+            result.add(dest);
+            dest = predecessor.get(dest.finalID);
+        }
 
-        String arrow = " -> ";
+        Collections.reverse(result);
 
-        if (predecessor.get(dest) == -1) arrow = "";
-
-        return predecessorPath(predecessor, predecessor.get(dest)) + arrow + db.getArticleTitleByID(dest);
+        return result;
     }
 
-    public String compute(int article1_id, int article2_id) throws SQLException {
-        Queue<Integer> bfsQueue = new LinkedList<>();
-        HashMap<Integer, Integer> predecessor = new HashMap<>();
+    public ArrayList<ArticleID> compute(int article1_id, int article2_id) throws SQLException {
+        Queue<ArticleID> bfsQueue = new LinkedList<>();
+        HashMap<Integer, ArticleID> predecessor = new HashMap<>();
 
-        bfsQueue.add(article1_id);
-        predecessor.put(article1_id, -1);
+        bfsQueue.add(new ArticleID(article1_id, article1_id));
+        predecessor.put(article1_id, null);
 
         while (!bfsQueue.isEmpty()) {
-            int articleID = bfsQueue.poll();
+            ArticleID articleID = bfsQueue.poll();
 
-            ArrayList<Integer> adjacentArticlesID = this.adjacencyMap.get(articleID);
+            ArrayList<ArticleID> adjacentArticlesID = this.adjacencyMap.get(articleID.finalID);
 
             System.out.print("\r"+predecessor.size() + " " + bfsQueue.size());
 
-            for (int adjacentArticleID : adjacentArticlesID) {
-                if (predecessor.containsKey(adjacentArticleID)) continue;
+            for (ArticleID adjacentArticleID : adjacentArticlesID) {
+                if (predecessor.containsKey(adjacentArticleID.finalID)) continue;
 
-                predecessor.put(adjacentArticleID, articleID);
+                predecessor.put(adjacentArticleID.finalID, articleID);
 
-                if (adjacentArticleID == article2_id) {
-                    return predecessorPath(predecessor, article2_id);
+                if (adjacentArticleID.finalID == article2_id) {
+                    return predecessorPath(predecessor, adjacentArticleID);
                 }
 
                 bfsQueue.add(adjacentArticleID);
             }
         }
 
-        return "NO PATH FOUND!";
+        return null;
     }
 }

@@ -28,15 +28,15 @@ public class DatabaseHelper {
         }
     }
 
-    public ArrayList<Integer> getAdjacentArticles(int article_id, boolean outbound) throws SQLException {
+    public ArrayList<ArticleID> getAdjacentArticles(int article_id, boolean outbound) throws SQLException {
         String query = """
-                SELECT COALESCE(r.to_article, aled.to_article) as adjacent_id FROM article_link_edge_directed aled
+                SELECT COALESCE(r.to_article, aled.to_article) as finalDest, aled.to_article as originalDest FROM article_link_edge_directed aled
                 LEFT JOIN redirect r ON aled.to_article=r.from_article
                 WHERE aled.from_article=?
                 """;
         if (!outbound) {
             query = """
-                SELECT COALESCE(r.to_article, aled.from_article) as adjacent_id FROM article_link_edge_directed aled
+                SELECT COALESCE(r.to_article, aled.to_article) as finalDest, aled.to_article as originalDest FROM article_link_edge_directed aled
                 LEFT JOIN redirect r ON aled.from_article=r.from_article
                 WHERE aled.to_article=?
                 """;
@@ -47,10 +47,11 @@ public class DatabaseHelper {
 
         ResultSet rs = stmt.executeQuery();
 
-        ArrayList<Integer> listResult = new ArrayList<>();
+        ArrayList<ArticleID> listResult = new ArrayList<>();
 
         while (rs.next()) {
-            listResult.add(rs.getInt("adjacent_id"));
+            listResult.add(new ArticleID(rs.getInt("finalDest"),
+                    rs.getInt("originalDest")));
         }
 
         return listResult;
