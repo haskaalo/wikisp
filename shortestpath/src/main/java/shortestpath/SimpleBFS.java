@@ -1,12 +1,10 @@
 package shortestpath;
 
 import shortestpath.database.ArticleID;
-import shortestpath.database.DatabaseHelper;
 import java.sql.SQLException;
 import java.util.*;
 
 public class SimpleBFS {
-    private DatabaseHelper db = DatabaseHelper.connect();
     private ArticleAdjacencyList adjacencyMap = ArticleAdjacencyList.deserialize();
 
     private ArrayList<ArticleID> predecessorPath(HashMap<Integer, ArticleID> predecessor, ArticleID dest) {
