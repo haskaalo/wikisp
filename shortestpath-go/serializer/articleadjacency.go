@@ -33,6 +33,7 @@ func SerializeArticleAdjacency() {
 	adjacencyList := ArticleAdjacencyList{}
 
 	database.InitDatabase()
+	defer database.CloseDatabase()
 
 	log.Println("SERIALIZATION: Fetching article ID list")
 
@@ -53,6 +54,7 @@ func SerializeArticleAdjacency() {
 	}
 
 	// Start writing to disk
+	log.Println("SERIALIZATION: Starting writing to disk")
 	destination, err := os.Create(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_article_map.gob"))
 	defer destination.Close()
 	if err != nil {
@@ -66,7 +68,6 @@ func SerializeArticleAdjacency() {
 	}
 
 	log.Println("SERIALIZATION: Done serializing article adjacency list")
-	database.CloseDatabase()
 }
 
 func performArticleBFS(articleID int, adjacencyList ArticleAdjacencyList) {

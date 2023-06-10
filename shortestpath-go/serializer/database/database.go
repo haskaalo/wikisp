@@ -114,3 +114,17 @@ func GetArticleComponentIDList() (*[]Component, error) {
 	return result, err
 
 }
+
+type Redirect struct {
+	From int `db:"from_article"`
+	To   int `db:"to_article"`
+}
+
+func GetRedirectList() (*[]Redirect, error) {
+	query := "SELECT from_article, to_article FROM redirect"
+	result := new([]Redirect)
+
+	err := db.Select(result, query)
+
+	return result, err
+}

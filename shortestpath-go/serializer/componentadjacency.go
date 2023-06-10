@@ -34,6 +34,7 @@ func SerializeComponentAdjacency() {
 	adjacencyList := ComponentAdjacencyList{}
 
 	database.InitDatabase()
+	defer database.CloseDatabase()
 
 	log.Println("SERIALIZATION: Fetching component ID list")
 	componentList, err := database.GetArticleComponentIDList()
@@ -53,6 +54,7 @@ func SerializeComponentAdjacency() {
 	}
 
 	// Start writing to disk
+	log.Println("SERIALIZATION: Starting writing to disk")
 	destination, err := os.Create(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_component_map.gob"))
 	defer destination.Close()
 	if err != nil {
@@ -65,7 +67,6 @@ func SerializeComponentAdjacency() {
 	}
 
 	log.Println("SERIALIZATION: Done serializing component adjacency list")
-	database.CloseDatabase()
 }
 
 func performComponentBFS(componentID int, adjacencyList ComponentAdjacencyList) {
