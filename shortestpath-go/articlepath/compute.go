@@ -2,50 +2,49 @@ package articlepath
 
 import (
 	"fanor.dev/wikisp/shortestpath/serializer"
-	"fanor.dev/wikisp/shortestpath/serializer/database"
+	"fanor.dev/wikisp/shortestpath/utils"
 )
 
-type PredecessorMap map[int]database.AdjacentArticle
+type PredecessorMap map[int]int
 
-func generatePredecessorPath(predecessor PredecessorMap, dest database.AdjacentArticle) []database.AdjacentArticle {
-	var result []database.AdjacentArticle
+func generatePredecessorPath(predecessor PredecessorMap, dest int) []int {
+	var result []int
 
-	for dest.FinalDestID != -1 {
+	for dest != -1 {
 		// Add at index 0
-		newResult := make([]database.AdjacentArticle, len(result)+1)
+		newResult := make([]int, len(result)+1)
 		newResult[0] = dest
 		copy(newResult[1:], result)
 
 		result = newResult
 
 		// next iteration
-		dest = predecessor[dest.FinalDestID]
+		dest = predecessor[dest]
 	}
 
 	return result
 }
 
-func ComputePathBFS(sourceID int, destinationID int, adjacencyList serializer.ArticleAdjacencyList) []database.AdjacentArticle {
-	bfsQueue := InitArticleQueue()
+func ComputePathBFS(sourceID int, destinationID int, adjacencyList serializer.ArticleAdjacencyList) []int {
+	bfsQueue := utils.InitQueue()
 	predecessor := PredecessorMap{}
 
-	bfsQueue.Enqueue(database.AdjacentArticle{FinalDestID: sourceID,
-		OriginalDestID: sourceID})
-	predecessor[sourceID] = database.AdjacentArticle{FinalDestID: -1}
+	bfsQueue.Enqueue(sourceID)
+	predecessor[sourceID] = -1
 
 	for !bfsQueue.IsEmpty() {
 		articleID := bfsQueue.Dequeue()
 
-		adjacentArticlesID := adjacencyList[articleID.FinalDestID]
+		adjacentArticles := adjacencyList[articleID]
 
-		for _, adjacentArticleID := range adjacentArticlesID {
-			_, existVisitedArticle := predecessor[adjacentArticleID.FinalDestID]
+		for _, adjacentArticleID := range adjacentArticles {
+			_, existVisitedArticle := predecessor[adjacentArticleID]
 			if existVisitedArticle {
 				continue
 			}
 
-			predecessor[adjacentArticleID.FinalDestID] = articleID
-			if adjacentArticleID.FinalDestID == destinationID {
+			predecessor[adjacentArticleID] = articleID
+			if adjacentArticleID == destinationID {
 				return generatePredecessorPath(predecessor, adjacentArticleID)
 			}
 
@@ -53,11 +52,11 @@ func ComputePathBFS(sourceID int, destinationID int, adjacencyList serializer.Ar
 		}
 	}
 
-	return []database.AdjacentArticle{}
+	return []int{}
 }
 
 func ExistPossiblePath(sourceID int, destinationID int, adjacencyList serializer.ComponentAdjacencyList) bool {
-	bfsQueue := serializer.InitQueue()
+	bfsQueue := utils.InitQueue()
 	visitedComponents := map[int]bool{}
 
 	bfsQueue.Enqueue(sourceID)

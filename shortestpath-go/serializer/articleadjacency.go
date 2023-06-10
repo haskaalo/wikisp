@@ -3,16 +3,17 @@ package serializer
 import (
 	"encoding/gob"
 	"fanor.dev/wikisp/shortestpath/serializer/database"
+	"fanor.dev/wikisp/shortestpath/utils"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 )
 
-type ArticleAdjacencyList map[int][]database.AdjacentArticle
+type ArticleAdjacencyList map[int][]int
 
 func DeserializeArticleAdjacency() ArticleAdjacencyList {
-	file, err := os.Open(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_article_map.data"))
+	file, err := os.Open(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_article_map.gob"))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -28,7 +29,7 @@ func DeserializeArticleAdjacency() ArticleAdjacencyList {
 	return articleAdjList
 }
 
-func serializeArticleAdjacency() {
+func SerializeArticleAdjacency() {
 	adjacencyList := ArticleAdjacencyList{}
 
 	database.InitDatabase()
@@ -52,7 +53,7 @@ func serializeArticleAdjacency() {
 	}
 
 	// Start writing to disk
-	destination, err := os.Create(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_article_map.data"))
+	destination, err := os.Create(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_article_map.gob"))
 	defer destination.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -69,7 +70,7 @@ func serializeArticleAdjacency() {
 }
 
 func performArticleBFS(articleID int, adjacencyList ArticleAdjacencyList) {
-	bfsQueue := InitQueue()
+	bfsQueue := utils.InitQueue()
 	visitedArticles := map[int]bool{}
 
 	bfsQueue.Enqueue(articleID)
@@ -83,9 +84,11 @@ func performArticleBFS(articleID int, adjacencyList ArticleAdjacencyList) {
 
 		fmt.Print(fmt.Sprintf("\radjacency list size: %d queue size: %d", len(visitedArticles), bfsQueue.Size()))
 
-		adjacencyList[articleID] = adjacentArticlesID
+		adjacencyList[articleID] = []int{}
 
 		for _, adjacentArticleID := range adjacentArticlesID {
+			adjacencyList[articleID] = append(adjacencyList[articleID], adjacentArticleID.OriginalDestID)
+
 			_, existVisitedArticle := visitedArticles[adjacentArticleID.FinalDestID]
 			if existVisitedArticle {
 				continue

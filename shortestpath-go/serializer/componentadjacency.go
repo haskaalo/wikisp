@@ -2,6 +2,7 @@ package serializer
 
 import (
 	"encoding/gob"
+	"fanor.dev/wikisp/shortestpath/utils"
 	"fmt"
 	"log"
 	"os"
@@ -13,7 +14,7 @@ import (
 type ComponentAdjacencyList map[int][]int
 
 func DeserializeComponentAdjacency() ComponentAdjacencyList {
-	file, err := os.Open(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_component_map.data"))
+	file, err := os.Open(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_component_map.gob"))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -29,7 +30,7 @@ func DeserializeComponentAdjacency() ComponentAdjacencyList {
 	return articleAdjList
 }
 
-func serializeComponentAdjacency() {
+func SerializeComponentAdjacency() {
 	adjacencyList := ComponentAdjacencyList{}
 
 	database.InitDatabase()
@@ -52,7 +53,7 @@ func serializeComponentAdjacency() {
 	}
 
 	// Start writing to disk
-	destination, err := os.Create(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_component_map.data"))
+	destination, err := os.Create(filepath.Join(os.Getenv("ADJACENCY_LIST_PATH"), "wikisp_component_map.gob"))
 	defer destination.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -68,39 +69,37 @@ func serializeComponentAdjacency() {
 }
 
 func performComponentBFS(componentID int, adjacencyList ComponentAdjacencyList) {
-	bfsQueue := InitQueue()
-	visitedArticles := map[int]bool{}
+	bfsQueue := utils.InitQueue()
+	visitedComponents := map[int]bool{}
 
 	bfsQueue.Enqueue(componentID)
 
 	for !bfsQueue.IsEmpty() {
 		componentID := bfsQueue.Dequeue()
-		adjacentArticles, err := database.GetAdjacentComponents(componentID)
+		adjacentComponents, err := database.GetAdjacentComponents(componentID)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		fmt.Print(fmt.Sprintf("\r adjacency list size: %d queue size: %d", len(visitedArticles), bfsQueue.Size()))
-		adjacentArticlesID := make([]int, len(adjacentArticles))
-		for i, val := range adjacentArticles {
-			adjacentArticlesID[i] = val.ID
-		}
+		fmt.Print(fmt.Sprintf("\r adjacency list size: %d queue size: %d", len(visitedComponents), bfsQueue.Size()))
 
-		adjacencyList[componentID] = adjacentArticlesID
+		adjacencyList[componentID] = []int{}
 
-		for _, adjacentArticleID := range adjacentArticlesID {
-			_, existVisitedArticle := visitedArticles[adjacentArticleID]
+		for _, adjacentComponent := range adjacentComponents {
+			adjacencyList[componentID] = append(adjacencyList[componentID], adjacentComponent.ID)
+
+			_, existVisitedArticle := visitedComponents[adjacentComponent.ID]
 			if existVisitedArticle {
 				continue
 			}
 
-			_, existAdjacencyList := adjacencyList[adjacentArticleID]
+			_, existAdjacencyList := adjacencyList[adjacentComponent.ID]
 			if existAdjacencyList {
 				continue
 			}
 
-			visitedArticles[adjacentArticleID] = true
-			bfsQueue.Enqueue(adjacentArticleID)
+			visitedComponents[adjacentComponent.ID] = true
+			bfsQueue.Enqueue(adjacentComponent.ID)
 		}
 	}
 }

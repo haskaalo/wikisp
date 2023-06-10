@@ -1,4 +1,4 @@
-package serializer
+package utils
 
 type Queue struct {
 	queue []int
