@@ -1,4 +1,4 @@
-module fanor.dev/wikisp/shortestpath/serializer
+module github.com/haskaalo/wikisp/serializer
 
 go 1.18
 

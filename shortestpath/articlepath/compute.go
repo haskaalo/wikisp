@@ -1,8 +1,8 @@
 package articlepath
 
 import (
-	"fanor.dev/wikisp/shortestpath/serializer"
-	"fanor.dev/wikisp/shortestpath/utils"
+	"github.com/haskaalo/wikisp/serializer"
+	"github.com/haskaalo/wikisp/utils"
 )
 
 type PredecessorMap map[int]int

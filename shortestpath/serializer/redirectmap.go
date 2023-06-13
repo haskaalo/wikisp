@@ -2,10 +2,11 @@ package serializer
 
 import (
 	"encoding/gob"
-	"fanor.dev/wikisp/shortestpath/serializer/database"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/haskaalo/wikisp/serializer/database"
 )
 
 type RedirectMap map[int]int

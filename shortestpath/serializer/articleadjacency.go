@@ -2,12 +2,13 @@ package serializer
 
 import (
 	"encoding/gob"
-	"fanor.dev/wikisp/shortestpath/serializer/database"
-	"fanor.dev/wikisp/shortestpath/utils"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/haskaalo/wikisp/serializer/database"
+	"github.com/haskaalo/wikisp/utils"
 )
 
 type ArticleAdjacencyList map[int][]int

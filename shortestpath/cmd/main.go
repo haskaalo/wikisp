@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fanor.dev/wikisp/shortestpath/serializer"
+	"github.com/haskaalo/wikisp/serializer"
 )
 
 func main() {

@@ -2,13 +2,14 @@ package serializer
 
 import (
 	"encoding/gob"
-	"fanor.dev/wikisp/shortestpath/utils"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
-	"fanor.dev/wikisp/shortestpath/serializer/database"
+	"github.com/haskaalo/wikisp/utils"
+
+	"github.com/haskaalo/wikisp/serializer/database"
 )
 
 type ComponentAdjacencyList map[int][]int
