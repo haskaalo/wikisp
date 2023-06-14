@@ -20,5 +20,5 @@ func main() {
 		w.Write([]byte("Hello world"))
 	})
 	log.Println("Starting web server")
-	http.ListenAndServe(":3000", r)
+	_ = http.ListenAndServe(":3000", r)
 }

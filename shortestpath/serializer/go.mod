@@ -1,6 +1,6 @@
 module github.com/haskaalo/wikisp/serializer
 
-go 1.18
+go 1.20
 
 require (
 	github.com/glebarez/go-sqlite v1.21.1
