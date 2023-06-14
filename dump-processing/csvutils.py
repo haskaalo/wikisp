@@ -146,4 +146,16 @@ def parseCSV():
     if len(pagesmentioned_batch) > 0:
         writePagesMentionedBatch(pagesmentioned_batch, db)
 
+    #
+    # Create search article table
+    #
+    print("Creating search article table")
+    try:
+        db.createArticleTitleSearchTable()
+        db.commit()
+    except Exception as e:
+        print("Failed to write to database: {}".format(e))
+        db.rollback()
+        return
+
     print("DONE!!!!!")

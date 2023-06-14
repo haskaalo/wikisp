@@ -38,6 +38,10 @@ class DatabaseHelper:
         query = "INSERT OR IGNORE INTO redirect (from_article, to_article) VALUES (?, ?)"
         self._cursor.executemany(query, batch)
 
+    def createArticleTitleSearchTable(self):
+        query = "INSERT INTO article_title_search SELECT title FROM article"
+        self._cursor.execute(query)
+
     def reformatData(self):
         # ===================================================
         # Fixes weirdly inverted redirects in wikipedia dumps

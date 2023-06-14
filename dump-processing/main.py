@@ -93,7 +93,7 @@ def writeToLocal(pq: Queue, eb: ExitBrake):
     pagesmentioned_csv.close()
 
 
-def main():
+def dumpProcessing():
     # This is a queue that can dequeue and enqueue items in different threads? (in a synchronized way)
     pq = Queue(maxsize=2000)
 
@@ -144,4 +144,4 @@ if __name__ == "__main__":
     elif args.partition:
         partition.performPartition()
     else:
-        main()
+        dumpProcessing()
