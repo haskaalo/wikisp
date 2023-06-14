@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/haskaalo/wikisp/webapi/database"
 	"github.com/haskaalo/wikisp/webapi/routers"
+	"log"
 	"net/http"
 )
 
@@ -18,6 +19,6 @@ func main() {
 	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello world"))
 	})
-
+	log.Println("Starting web server")
 	http.ListenAndServe(":3000", r)
 }

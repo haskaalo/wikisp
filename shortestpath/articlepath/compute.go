@@ -25,26 +25,41 @@ func generatePredecessorPath(predecessor PredecessorMap, dest int) []int {
 	return result
 }
 
-func ComputePathBFS(sourceID int, destinationID int, adjacencyList serializer.ArticleAdjacencyList) []int {
+func getRealID(source int, redirectMap serializer.RedirectMap) int {
+	val, exist := redirectMap[source]
+	if !exist {
+		return source
+	}
+
+	return val
+}
+
+func ComputePathBFS(sourceID int, destinationID int, adjacencyList serializer.ArticleAdjacencyList, redirectMap serializer.RedirectMap) []int {
 	bfsQueue := utils.InitQueue()
 	predecessor := PredecessorMap{}
+	visitedArticles := map[int]bool{}
 
 	bfsQueue.Enqueue(sourceID)
 	predecessor[sourceID] = -1
+	visitedArticles[sourceID] = true
 
 	for !bfsQueue.IsEmpty() {
 		articleID := bfsQueue.Dequeue()
 
-		adjacentArticles := adjacencyList[articleID]
+		adjacentArticles := adjacencyList[getRealID(articleID, redirectMap)]
 
 		for _, adjacentArticleID := range adjacentArticles {
-			_, existVisitedArticle := predecessor[adjacentArticleID]
+			realAdjacentArticleID := getRealID(adjacentArticleID, redirectMap)
+
+			_, existVisitedArticle := visitedArticles[realAdjacentArticleID]
 			if existVisitedArticle {
 				continue
 			}
 
 			predecessor[adjacentArticleID] = articleID
-			if adjacentArticleID == destinationID {
+			visitedArticles[realAdjacentArticleID] = true
+
+			if realAdjacentArticleID == destinationID {
 				return generatePredecessorPath(predecessor, adjacentArticleID)
 			}
 

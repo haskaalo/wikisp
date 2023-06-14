@@ -11,7 +11,7 @@ type getSearchTitleResponse struct {
 	Result []string `json:"result"`
 }
 
-func GetSearchTitle(w http.ResponseWriter, r *http.Request) {
+func getSearchTitle(w http.ResponseWriter, r *http.Request) {
 	if !r.URL.Query().Has("q") {
 		response.InvalidParameter(w, "q")
 		return

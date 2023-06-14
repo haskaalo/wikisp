@@ -35,7 +35,7 @@ func SearchArticle(searchQuery string) ([]string, error) {
 	queryResult := []SearchArticleResult{}
 	query := "SELECT distinct title collate nocase as title FROM article_title_search WHERE title MATCH ? limit 10"
 
-	err := db.Select(&queryResult, query, "^"+searchQuery+"*")
+	err := db.Select(&queryResult, query, "^"+searchQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -46,4 +46,21 @@ func SearchArticle(searchQuery string) ([]string, error) {
 	}
 
 	return result, nil
+}
+
+type ArticleIDFromTitle struct {
+	ID          int `db:"id"`
+	ComponentID int `db:"component_id"`
+}
+
+func GetArticleIDsFromTitle(title string) (int, int, error) {
+	queryResult := ArticleIDFromTitle{}
+	query := "SELECT id, component_id FROM article WHERE title=?"
+
+	err := db.Get(&queryResult, query, title)
+	if err != nil {
+		return -1, -1, err
+	}
+
+	return queryResult.ID, queryResult.ComponentID, nil
 }
