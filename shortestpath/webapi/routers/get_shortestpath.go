@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"database/sql"
 	"fanor.dev/wikidg/shortestpath/articlepath"
 	"github.com/haskaalo/wikisp/serializer"
 	"github.com/haskaalo/wikisp/webapi/database"
@@ -24,6 +25,7 @@ type getShortestPathResponse struct {
 }
 
 func getShortestPath(w http.ResponseWriter, r *http.Request) {
+
 	if !r.URL.Query().Has("from") {
 		response.InvalidParameter(w, "from")
 		return
@@ -33,14 +35,20 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fromID, fromComponentID, err := database.GetArticleIDsFromTitle(r.URL.Query().Get("from"))
-	if err != nil {
+	if err == sql.ErrNoRows {
+		response.InvalidParameter(w, "from")
+		return
+	} else if err != nil {
 		response.InternalError(w)
 		log.Println(err)
 		return
 	}
 
 	toID, toComponentID, err := database.GetArticleIDsFromTitle(r.URL.Query().Get("to"))
-	if err != nil {
+	if err == sql.ErrNoRows {
+		response.InvalidParameter(w, "to")
+		return
+	} else if err != nil {
 		response.InternalError(w)
 		log.Println(err)
 		return

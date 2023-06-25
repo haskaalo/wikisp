@@ -17,7 +17,7 @@ func main() {
 	r.Mount("/", routers.BootstrapRouters())
 
 	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello world"))
+		w.Write([]byte("testing"))
 	})
 	log.Println("Starting web server")
 	_ = http.ListenAndServe(":3000", r)
