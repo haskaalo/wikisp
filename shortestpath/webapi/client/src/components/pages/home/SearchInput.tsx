@@ -19,6 +19,7 @@ function SearchInput(props: IProps) {
             return;
         }
 
+        // TODO: catch error lol
         const searchResult = await SearchArticleTitle(event.currentTarget.value);
         setInputResults(searchResult);
     }
