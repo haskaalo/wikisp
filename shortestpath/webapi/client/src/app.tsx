@@ -1,9 +1,6 @@
 import * as React from "react";
+import HomePage from "./components/pages/home"
 
-class App extends React.Component {
-    render() {
-        return <>Hello world</>
-    }
-}
+import "./styles/base.scss";
 
-export default App;
+export default HomePage;

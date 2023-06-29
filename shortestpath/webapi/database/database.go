@@ -64,3 +64,16 @@ func GetArticleIDsFromTitle(title string) (int, int, error) {
 
 	return queryResult.ID, queryResult.ComponentID, nil
 }
+
+func GetArticleTitleFromID(ID int) (string, error) {
+	queryResult := SearchArticleResult{}
+
+	query := "SELECT title FROM article WHERE id=?"
+
+	err := db.Get(&queryResult, query, ID)
+	if err != nil {
+		return "", err
+	}
+
+	return queryResult.Title, nil
+}

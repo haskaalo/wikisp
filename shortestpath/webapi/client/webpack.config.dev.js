@@ -3,11 +3,6 @@ const common = require('./webpack.config.common.js');
 
 const {DefinePlugin} = require('webpack');
 
-const buildconfig = {
-    apiUrl: process.env.APIURL || "/api",
-    isDev: true,
-}
-
 module.exports = merge(common, {
     devtool: 'source-map',
     mode: 'development',
@@ -21,7 +16,7 @@ module.exports = merge(common, {
     },
     plugins: [
         new DefinePlugin({
-            BUILDCONFIG: JSON.stringify(buildconfig),
-        })
+            BUILDCONFIG: JSON.stringify({apiURL: "http://localhost:3000"})
+        }),
     ]
 });

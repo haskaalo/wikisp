@@ -20,8 +20,13 @@ func initSerializedData() {
 	redirectMap = serializer.DeserializeRedirectMap()
 }
 
+type articleElement struct {
+	OriginalTitle string `json:"original_title"`
+	RedirectTo    string `json:"redirect_to_title"`
+}
+
 type getShortestPathResponse struct {
-	Path []int `json:"path"`
+	Path []articleElement `json:"path"`
 }
 
 func getShortestPath(w http.ResponseWriter, r *http.Request) {
@@ -57,11 +62,34 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 	if fromComponentID != toComponentID {
 		exist := articlepath.ExistPossiblePath(fromComponentID, toComponentID, componentAdjacencyList)
 		if !exist {
-			response.Respond(w, &getShortestPathResponse{Path: []int{}}, http.StatusOK)
+			response.Respond(w, &getShortestPathResponse{Path: []articleElement{}}, http.StatusOK)
 			return
 		}
 	}
 
 	result := articlepath.ComputePathBFS(fromID, toID, articleAdjacencyList, redirectMap)
-	response.Respond(w, &getShortestPathResponse{Path: result}, http.StatusOK)
+	var resultJSON []articleElement
+
+	for _, articleID := range result {
+		originalTitle, err := database.GetArticleTitleFromID(articleID)
+		if err != nil {
+			response.InternalError(w)
+			return
+		}
+
+		redirectArticleID, exist := redirectMap[articleID]
+		redirectTitle := ""
+
+		if exist {
+			redirectTitle, err = database.GetArticleTitleFromID(redirectArticleID)
+			if err != nil {
+				response.InternalError(w)
+				return
+			}
+		}
+
+		resultJSON = append(resultJSON, articleElement{OriginalTitle: originalTitle, RedirectTo: redirectTitle})
+	}
+
+	response.Respond(w, &getShortestPathResponse{Path: resultJSON}, http.StatusOK)
 }

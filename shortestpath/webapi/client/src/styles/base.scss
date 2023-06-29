@@ -1,0 +1,19 @@
+@import "~bootstrap/scss/bootstrap";
+@import "./override.scss";
+
+html, body {
+    height: 100%;
+    width: 100%;
+    background: #D3E0E9;
+    background: linear-gradient(0deg, #D3E0E9, #FFFFEE);
+}
+
+.typical-page-layout {
+    margin: auto;
+    padding-top: 5em;
+    width: 80%;
+}
+
+.align-center {
+    text-align: center;
+}

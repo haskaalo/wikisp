@@ -18,6 +18,10 @@ func getSearchTitle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	searchQuery := r.URL.Query().Get("q")
+	if searchQuery == "" {
+		response.Respond(w, getSearchTitleResponse{Result: []string{}}, http.StatusOK)
+		return
+	}
 
 	result, err := database.SearchArticle(searchQuery)
 	if err != nil {
