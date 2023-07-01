@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/haskaalo/wikisp/webapi/response"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,7 +11,9 @@ import (
 
 // BootstrapRouters Create a router with every paths
 func BootstrapRouters() *chi.Mux {
+	log.Println("Deserializing wiki graph data")
 	initSerializedData()
+	log.Println("Done deserializing wiki graph data")
 	response.InitTemplates()
 
 	router := chi.NewRouter()

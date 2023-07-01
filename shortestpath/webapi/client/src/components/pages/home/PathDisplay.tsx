@@ -18,11 +18,9 @@ function PathDisplay(props: IProps) {
 
         const nextArrow = <>&rarr;</>;
 
-        return <>
-        <Col key={title} md>
+        return <Col key={title} md>
             {title} {lastElem ? null : nextArrow}
-        </Col>
-        </>;
+        </Col>;
     }
 
     return <>

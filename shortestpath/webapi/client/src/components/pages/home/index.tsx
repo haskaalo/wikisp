@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button, Col, Container, Form, Row } from "reactstrap";
 import "./home_style.scss";
-import { ArticleTitle } from "@home/request";
+import { ArticleTitle, KnownError } from "@home/request";
 import SearchInput from "./SearchInput";
 import { FindShortestPath } from "@home/request";
 import PathDisplay from "./PathDisplay";
@@ -17,9 +17,22 @@ function HomePage() {
     async function handleFormSubmit(event: React.FormEvent) {
         event.preventDefault();
 
-        // TODO: catch error lol
-        const pathResult = await FindShortestPath(input1Val, input2Val);
-        setPath(pathResult);
+
+        try {
+            const pathResult = await FindShortestPath(input1Val, input2Val);
+            if (pathResult.length === 0) {
+                alert("No path possible!");
+            } else {
+                setPath(pathResult);
+            }
+        } catch(err) {
+            if (err.message === KnownError.INVALID_PARAMETER) {
+                // TODO: Change this
+                alert("An article doesn't exist");
+            } else {
+                alert("Internal error");
+            }
+        }
     }
 
     return <>
