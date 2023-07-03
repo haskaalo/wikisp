@@ -1,0 +1,26 @@
+.col-path {
+    //border: 2px solid black;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .path-arrow {
+        height: 50%;
+        transform: translateY(50%);
+
+        svg {
+            transform: rotate(90deg);
+            height: 50%;
+        }
+    }
+}
+
+.path-arrow {
+    width: 100%;
+    text-align: center;
+}
+
+.article-info {
+    //padding-bottom: 100%;
+    width: 100%;
+}

@@ -33,6 +33,8 @@ type SearchArticleResult struct {
 
 func SearchArticle(searchQuery string) ([]string, error) {
 	queryResult := []SearchArticleResult{}
+
+	// TODO: Fix punctuation errors
 	query := "SELECT distinct title collate nocase as title FROM article_title_search WHERE title MATCH ? limit 10"
 
 	err := db.Select(&queryResult, query, "^"+searchQuery)

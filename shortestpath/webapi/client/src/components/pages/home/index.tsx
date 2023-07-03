@@ -58,7 +58,7 @@ function HomePage() {
             </Row>
         </Form>
     </Container>
-    <Container fluid className="typical-page-layout">
+    <Container fluid className="typical-page-layout path-container">
         <Row>
             {path.length === 0 ? null : <PathDisplay path={path}/>}
         </Row>
