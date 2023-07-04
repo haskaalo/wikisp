@@ -79,3 +79,19 @@ func GetArticleTitleFromID(ID int) (string, error) {
 
 	return queryResult.Title, nil
 }
+
+func GetRandomArticles(limit int) ([]string, error) {
+	queryResult := []SearchArticleResult{}
+	query := "SELECT title FROM article ORDER BY RANDOM() LIMIT ?"
+	err := db.Select(&queryResult, query, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	result := []string{}
+	for _, article := range queryResult {
+		result = append(result, article.Title)
+	}
+
+	return result, nil
+}

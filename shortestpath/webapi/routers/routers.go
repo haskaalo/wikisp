@@ -24,6 +24,7 @@ func BootstrapRouters() *chi.Mux {
 	})
 	router.Get("/search", getSearchTitle)
 	router.Get("/find_path", getShortestPath)
+	router.Get("/random_article_titles", getRandomArticles)
 
 	assetsPath := os.Getenv("WIKISP_ASSETS_PATH")
 	fs := http.FileServer(http.Dir(assetsPath))
