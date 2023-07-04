@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ArticleTitle } from "@home/request";
-import { Col } from "reactstrap";
+import { Col, Container, Row } from "reactstrap";
 import "./pathdisplay_style.scss";
 
 interface IProps {
@@ -16,12 +16,11 @@ function PathDisplay(props: IProps) {
     function pathBuilder(idx: number, article: ArticleTitle) {
         const title = article.redirect_to_title === "" ? article.original_title : article.redirect_to_title;
         const lastElem = idx === indexedPath.length - 1;
-
         // For smaller screens
 
         const nextArrow = <Col md className="col-path">
             <div className="path-arrow">
-                <svg width="30%" height="30%" viewBox="0 0 100 100">
+                <svg width="100%" height="auto" viewBox="0 0 100 100">
                     <line x1="0" y1="50" x2="100" y2="50" stroke="black" strokeWidth="7" />
                     <line x1="45" y1="10" x2="100" y2="50" stroke="black" strokeWidth="7" />
                     <line x1="45" y1="90" x2="100" y2="50" stroke="black" strokeWidth="7" />
@@ -32,16 +31,18 @@ function PathDisplay(props: IProps) {
         return <React.Fragment key={title}>
           <Col md className="col-path">
             <div className="article-info">
-                {title}
+                <h3>{title}</h3>
             </div>
         </Col>
         {lastElem ? null : nextArrow}
         </React.Fragment>;
     }
 
-    return <>
+    return <Container fluid className="path-container typical-page-layout">
+        <Row>
         {indexedPath.map(article => pathBuilder(article.idx, article.val))}
-    </>
+        </Row>
+    </Container>
 }
 
 export default PathDisplay;

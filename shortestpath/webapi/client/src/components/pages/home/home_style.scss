@@ -1,3 +1,5 @@
+@import "@home/styles/variables.scss";
+
 .space-after-title {
     padding-bottom: 4em;
 }
@@ -13,9 +15,36 @@
 .path-container {
     height: 20%;
     margin-top: 3em !important;
+    background-color: white;
+    animation: 500ms path-container-animation
 }
 
+@keyframes path-container-animation {
+    0% {
+        transform: scaleY(0)
+    }
+    25% {
+        transform: scaleY(0.25)
+    }
+    50% {
+        transform: scaleY(0.5)
+    }
+    75% {
+        transform: scaleY(0.75)
+    }
+    100% {
+        transform: scaleY(1)
+    }
+}
+
+.wikisp-logo {
+    font-family: $font-wiki;
+}
 
 #wikisp-title {
     font-size: 9vh;
+}
+
+.wikisp-title-larger {
+    font-size: 13vh;
 }

@@ -5,22 +5,33 @@
 
 @media (max-width: 768px) {
     .path-arrow {
-        height: 50%;
         transform: translateY(50%);
 
         svg {
-            transform: rotate(90deg);
-            height: 50%;
+            writing-mode: vertical-rl;
+            transform: rotate(-270deg);
+            height: 20%;
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .path-arrow {
+        svg {
+            height: 40px;
+            width: 50px
         }
     }
 }
 
 .path-arrow {
     width: 100%;
+    height: 80%;
     text-align: center;
 }
 
 .article-info {
     //padding-bottom: 100%;
+    font-family: 'LinuxLibertine','Georgia','Times',serif;
     width: 100%;
 }

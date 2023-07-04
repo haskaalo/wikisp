@@ -6,12 +6,6 @@
     src: url("@home/static/LinLibertine_R.ttf") format("truetype");
 }
 
-$font-wiki: "LinuxLibertine", sans-serif;
-
-.wikisp-logo {
-    font-family: $font-wiki;
-}
-
 html, body, #root-app {
     height: 100%;
     width: 100%;
