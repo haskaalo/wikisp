@@ -5,7 +5,6 @@ const TerserPlugin = require("terser-webpack-plugin"); // Uglify
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const buildconfig = {
-    apiUrl: process.env.APIURL || "/api",
     isDev: false,
 };
 

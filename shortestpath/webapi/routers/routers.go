@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 )
 
 // BootstrapRouters Create a router with every paths
@@ -17,10 +16,6 @@ func BootstrapRouters() *chi.Mux {
 	response.InitTemplates()
 
 	router := chi.NewRouter()
-	assetsPath := os.Getenv("WIKISP_ASSETS_PATH")
-
-	fs := http.FileServer(http.Dir(filepath.Join(assetsPath, "/static")))
-	router.Handle("/static/*", http.StripPrefix("/static/", fs))
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		response.Render(w, response.RenderData{
@@ -29,6 +24,10 @@ func BootstrapRouters() *chi.Mux {
 	})
 	router.Get("/search", getSearchTitle)
 	router.Get("/find_path", getShortestPath)
+
+	assetsPath := os.Getenv("WIKISP_ASSETS_PATH")
+	fs := http.FileServer(http.Dir(assetsPath))
+	router.Handle("/*", http.StripPrefix("/", fs))
 
 	return router
 }

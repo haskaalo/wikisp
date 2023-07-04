@@ -8,7 +8,8 @@ module.exports = {
     },
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'static/js/[name].[hash].js',
+        filename: 'js/[name].[fullhash].js',
+        publicPath: '/static'
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json', '.css', '.scss'],
@@ -31,15 +32,18 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(png|jpg|gif)$/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            outputPath: "static/img",
-                        }
-                    }
-                ]
+                test: /\.(svg)$/,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'svg/[name].[hash].[ext]'
+                }
+            },
+            {
+                test: /\.ttf/,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'fonts/[name].[hash].[ext]'
+                }
             }
         ]
     },
@@ -50,8 +54,8 @@ module.exports = {
             filename: "html/index.html",
         }),
         new MiniCssExtractPlugin({
-            filename: "static/css/styles.[hash].css",
-            chunkFilename: "static/css/[id].[chunkhash].css",
+            filename: "css/styles.[fullhash].css",
+            chunkFilename: "css/[id].[chunkhash].css",
         }),
     ]
 };

@@ -33,7 +33,7 @@ func InitTemplates() {
 		go func() {
 			for {
 				templates = template.Must(template.ParseGlob(filepath.Join(assetsPath, "/html/*")))
-				time.Sleep(3 * time.Second)
+				time.Sleep(1 * time.Second)
 			}
 		}()
 	}

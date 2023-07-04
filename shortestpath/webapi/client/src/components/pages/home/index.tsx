@@ -5,6 +5,7 @@ import { ArticleTitle, KnownError } from "@home/request";
 import SearchInput from "./SearchInput";
 import { FindShortestPath } from "@home/request";
 import PathDisplay from "./PathDisplay";
+import WikiSPLogo from "../WikiSPLogo";
 
 function HomePage() {
     const [input1Val, setInput1Val] = React.useState("");
@@ -38,7 +39,7 @@ function HomePage() {
     return <>
         <Container fluid className="typical-page-layout">
         <Row className="space-after-title">
-            <h1 style={{textAlign: "center"}}>WikiSP</h1>
+            <WikiSPLogo/>
         </Row>
         <Form onSubmit={handleFormSubmit}>
             <Row className="space-after-inputs">
