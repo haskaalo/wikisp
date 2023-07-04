@@ -27,7 +27,7 @@ function WikiSPLogo() {
                 <animate attributeName="opacity" values="0;1" dur="440ms" />
             </image>
         </svg>
-        <h1>WikiSP</h1>
+        <h1 id="wikisp-title">WikiSP</h1>
     </div>
 }
 
