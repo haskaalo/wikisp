@@ -15,22 +15,12 @@
 .path-container {
     height: 20%;
     margin-top: 3em !important;
-    background-color: white;
     animation: 500ms path-container-animation
 }
 
 @keyframes path-container-animation {
     0% {
         transform: scaleY(0)
-    }
-    25% {
-        transform: scaleY(0.25)
-    }
-    50% {
-        transform: scaleY(0.5)
-    }
-    75% {
-        transform: scaleY(0.75)
     }
     100% {
         transform: scaleY(1)

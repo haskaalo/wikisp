@@ -30,7 +30,7 @@ function PathDisplay(props: IProps) {
 
         return <React.Fragment key={title}>
           <Col md className="col-path">
-            <div className="article-info">
+            <div className="article-info rounded">
                 <h3>{title}</h3>
             </div>
         </Col>
@@ -38,7 +38,7 @@ function PathDisplay(props: IProps) {
         </React.Fragment>;
     }
 
-    return <Container fluid className="path-container typical-page-layout">
+    return <Container fluid className="path-container typical-page-layout rounded">
         <Row>
         {indexedPath.map(article => pathBuilder(article.idx, article.val))}
         </Row>

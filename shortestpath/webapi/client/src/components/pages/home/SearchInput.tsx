@@ -59,7 +59,7 @@ function SearchInput(props: IProps) {
     }, []);
     
     return <>
-        <Input bsSize="lg" onChange={handleInput1Change} onBlur={inputBlurEvent} onFocus={inputFocusEvent} placeholder={inputPlaceholderVal} />
+        <Input bsSize="lg" onChange={handleInput1Change} onBlur={inputBlurEvent} onFocus={inputFocusEvent} placeholder={inputPlaceholderVal} className="shadow"/>
         <ListGroup>
             <div style={{position: "absolute"}}>
                 {inputResults.map(s => <ListGroupItem key={s}>{s}</ListGroupItem>)}
