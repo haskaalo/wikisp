@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	_ "github.com/glebarez/go-sqlite"
 	"github.com/jmoiron/sqlx"
 	"log"
@@ -51,20 +52,28 @@ func SearchArticle(searchQuery string) ([]string, error) {
 }
 
 type ArticleIDFromTitle struct {
-	ID          int `db:"id"`
-	ComponentID int `db:"component_id"`
+	ID          int           `db:"id"`
+	ComponentID sql.NullInt64 `db:"component_id"`
 }
 
 func GetArticleIDsFromTitle(title string) (int, int, error) {
 	queryResult := ArticleIDFromTitle{}
-	query := "SELECT id, component_id FROM article WHERE title=?"
+	query := `SELECT id, component_id FROM article where title=?`
 
 	err := db.Get(&queryResult, query, title)
 	if err != nil {
 		return -1, -1, err
 	}
 
-	return queryResult.ID, queryResult.ComponentID, nil
+	if !queryResult.ComponentID.Valid {
+		query := `SELECT id, component_id FROM article where id=?`
+		err = db.Get(&queryResult, query, RedirectMap[queryResult.ID])
+		if err != nil {
+			return -1, -1, err
+		}
+	}
+
+	return queryResult.ID, int(queryResult.ComponentID.Int64), nil
 }
 
 func GetArticleTitleFromID(ID int) (string, error) {

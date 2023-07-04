@@ -59,7 +59,7 @@ function HomePage() {
             </Row>
         </Form>
     </Container>
-    <Container fluid className="typical-page-layout path-container">
+    <Container fluid className="path-container typical-page-layout" style={{backgroundColor: "white"}}>
         <Row>
             {path.length === 0 ? null : <PathDisplay path={path}/>}
         </Row>

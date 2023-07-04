@@ -3,22 +3,11 @@ package routers
 import (
 	"database/sql"
 	"fanor.dev/wikidg/shortestpath/articlepath"
-	"github.com/haskaalo/wikisp/serializer"
 	"github.com/haskaalo/wikisp/webapi/database"
 	"github.com/haskaalo/wikisp/webapi/response"
 	"log"
 	"net/http"
 )
-
-var articleAdjacencyList serializer.ArticleAdjacencyList
-var componentAdjacencyList serializer.ComponentAdjacencyList
-var redirectMap serializer.RedirectMap
-
-func initSerializedData() {
-	articleAdjacencyList = serializer.DeserializeArticleAdjacency()
-	componentAdjacencyList = serializer.DeserializeComponentAdjacency()
-	redirectMap = serializer.DeserializeRedirectMap()
-}
 
 type articleElement struct {
 	OriginalTitle string `json:"original_title"`
@@ -60,14 +49,14 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if fromComponentID != toComponentID {
-		exist := articlepath.ExistPossiblePath(fromComponentID, toComponentID, componentAdjacencyList)
+		exist := articlepath.ExistPossiblePath(fromComponentID, toComponentID, database.ComponentAdjacencyList)
 		if !exist {
 			response.Respond(w, &getShortestPathResponse{Path: []articleElement{}}, http.StatusOK)
 			return
 		}
 	}
 
-	result := articlepath.ComputePathBFS(fromID, toID, articleAdjacencyList, redirectMap)
+	result := articlepath.ComputePathBFS(fromID, toID, database.ArticleAdjacencyList, database.RedirectMap)
 	var resultJSON []articleElement
 
 	for _, articleID := range result {
@@ -77,7 +66,7 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		redirectArticleID, exist := redirectMap[articleID]
+		redirectArticleID, exist := database.RedirectMap[articleID]
 		redirectTitle := ""
 
 		if exist {
