@@ -59,6 +59,10 @@ function SearchInput(props: IProps) {
         return () => clearInterval(interval);
     }, []);
 
+    if (props.disabled && inputResults.length > 0) {
+        inputBlurEvent();
+    }
+    
     return <>
         <Input bsSize="lg" onChange={handleInputChange} onBlur={inputBlurEvent} onFocus={inputFocusEvent} 
         placeholder={inputPlaceholderVal} 
