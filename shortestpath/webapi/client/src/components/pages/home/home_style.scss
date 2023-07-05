@@ -1,7 +1,7 @@
 @import "@home/styles/variables.scss";
 
 .space-after-title {
-    padding-bottom: 4em;
+    padding-bottom: 2em;
 }
 
 .space-after-inputs {
@@ -37,4 +37,9 @@
 
 .wikisp-title-larger {
     font-size: 13vh;
+}
+
+.wikisp-desc {
+    text-align: center;
+    text-justify: justify;
 }

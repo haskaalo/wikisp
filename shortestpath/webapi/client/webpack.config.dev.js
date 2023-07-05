@@ -16,7 +16,7 @@ module.exports = merge(common, {
     },
     plugins: [
         new DefinePlugin({
-            BUILDCONFIG: JSON.stringify({apiURL: "http://localhost:3000"})
+            BUILDCONFIG: JSON.stringify({apiURL: ""})
         }),
     ]
 });
