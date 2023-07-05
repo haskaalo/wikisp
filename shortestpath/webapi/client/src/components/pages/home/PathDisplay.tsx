@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ArticleTitle } from "@home/request";
-import { Col, Container, Row } from "reactstrap";
+import { Col, Container, Row, Tooltip } from "reactstrap";
 import "./pathdisplay_style.scss";
 
 interface IProps {
@@ -18,7 +18,7 @@ function PathDisplay(props: IProps) {
         const lastElem = idx === indexedPath.length - 1;
         // For smaller screens
 
-        const nextArrow = <Col md className="col-path">
+        const nextArrow = <Col md="auto" className="col-path">
             <div className="path-arrow">
                 <svg width="100%" height="auto" viewBox="0 0 100 100">
                     <line x1="0" y1="50" x2="100" y2="50" stroke="black" strokeWidth="7" />
@@ -29,14 +29,17 @@ function PathDisplay(props: IProps) {
         </Col>;
 
         return <React.Fragment key={title}>
-          <Col md className="col-path">
-            <div className="article-info rounded">
-                <h3>{title}</h3>
+          <Col md="auto" className="col-path">
+            <div className="article-info rounded" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="test">
+                <h3>
+                    {title}
+                </h3>
             </div>
         </Col>
         {lastElem ? null : nextArrow}
         </React.Fragment>;
     }
+
 
     return <Container fluid className="path-container typical-page-layout rounded">
         <Row>

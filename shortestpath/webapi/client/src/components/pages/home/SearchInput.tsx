@@ -4,6 +4,7 @@ import { Input, ListGroup, ListGroupItem } from "reactstrap";
 
 interface IProps {
     onInputChange: (value: string) => void;
+    disabled: boolean
 }
 
 function SearchInput(props: IProps) {
@@ -12,7 +13,7 @@ function SearchInput(props: IProps) {
     const [inputPreviousResults, setInputPreviousResults] = React.useState(defaultVal);
     const [inputPlaceholderVal, setInputPlaceholderVal] = React.useState("");
 
-    async function handleInput1Change(event: React.ChangeEvent<HTMLInputElement>) {
+    async function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         props.onInputChange(event.currentTarget.value);
 
         if (event.currentTarget.value == "") {
@@ -57,10 +58,13 @@ function SearchInput(props: IProps) {
 
         return () => clearInterval(interval);
     }, []);
-    
+
     return <>
-        <Input bsSize="lg" onChange={handleInput1Change} onBlur={inputBlurEvent} onFocus={inputFocusEvent} placeholder={inputPlaceholderVal} className="shadow"/>
-        <ListGroup>
+        <Input bsSize="lg" onChange={handleInputChange} onBlur={inputBlurEvent} onFocus={inputFocusEvent} 
+        placeholder={inputPlaceholderVal} 
+        className="shadow"
+        disabled={props.disabled}/>
+        <ListGroup hidden={props.disabled}>
             <div style={{position: "absolute"}}>
                 {inputResults.map(s => <ListGroupItem key={s}>{s}</ListGroupItem>)}
             </div>

@@ -10,14 +10,17 @@ import WikiSPLogo from "../WikiSPLogo";
 function HomePage() {
     const [input1Val, setInput1Val] = React.useState("");
     const [input2Val, setInput2Val] = React.useState("");
-    const findPathButtonDisabled = input1Val === "" || input2Val === "";
+    const [searchInProgress, setSearchInProgress] = React.useState(false);
+
+    const findPathButtonDisabled = input1Val === "" || input2Val === "" || searchInProgress === true;
 
     const defaultPathVal: ArticleTitle[] = [] // To avoid typescript casting to any[]
     const [path, setPath] = React.useState(defaultPathVal);
 
     async function handleFormSubmit(event: React.FormEvent) {
         event.preventDefault();
-
+        setPath([]);
+        setSearchInProgress(true);
 
         try {
             const pathResult = await FindShortestPath(input1Val, input2Val);
@@ -34,6 +37,8 @@ function HomePage() {
                 alert("Internal error");
             }
         }
+
+        setSearchInProgress(false);
     }
 
     return <>
@@ -44,10 +49,10 @@ function HomePage() {
         <Form onSubmit={handleFormSubmit}>
             <Row className="space-after-inputs">
                 <Col md="6" className="between-input-small-space">
-                    <SearchInput onInputChange={setInput1Val}/>
+                    <SearchInput onInputChange={setInput1Val} disabled={searchInProgress} />
                 </Col>
                 <Col md="6">
-                    <SearchInput onInputChange={setInput2Val} />
+                    <SearchInput onInputChange={setInput2Val} disabled={searchInProgress} />
                 </Col>
             </Row>
             <Row>
