@@ -1,6 +1,10 @@
 .col-path {
     //border: 2px solid black;
     text-align: center;
+
+    @media (min-width: 769px) {
+        margin-bottom: 1em;
+    }
 }
 
 @media (max-width: 768px) {
