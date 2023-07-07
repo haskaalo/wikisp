@@ -79,6 +79,13 @@ function HomePage() {
         </Form>
     </Container>
     {path.length === 0 ? null : <PathDisplay path={path}/>}
+    <div className="footer">
+        <div className="footer-text">
+        Made with ❤️ by Joey
+        <br/>
+        <a href="https://github.com/haskaalo/wikisp">GitHub repository</a>
+        </div>
+    </div>
     </>;
 }
 
