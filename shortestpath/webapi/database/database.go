@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
+	"strings"
 )
 
 var (
@@ -32,13 +33,17 @@ type SearchArticleResult struct {
 	Title string `db:"title"`
 }
 
+func sanitizeFTS(query string) string {
+	return strings.ReplaceAll(query, "\"", "\"\"")
+}
+
 func SearchArticle(searchQuery string) ([]string, error) {
 	queryResult := []SearchArticleResult{}
 
-	// TODO: Fix punctuation errors
-	query := "SELECT distinct title collate nocase as title FROM article_title_search WHERE title MATCH ? limit 10"
+	query := `SELECT distinct title collate nocase as title FROM article_title_search
+		WHERE title MATCH '^' || '"' || ? || '"' limit 10`
 
-	err := db.Select(&queryResult, query, "^"+searchQuery)
+	err := db.Select(&queryResult, query, sanitizeFTS(searchQuery))
 	if err != nil {
 		return nil, err
 	}
