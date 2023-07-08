@@ -12,8 +12,10 @@ function SearchInput(props: IProps) {
     const [inputResults, setInputResults] = React.useState(defaultVal);
     const [inputPreviousResults, setInputPreviousResults] = React.useState(defaultVal);
     const [inputPlaceholderVal, setInputPlaceholderVal] = React.useState("");
+    const [inputVal, setInputVal] = React.useState("");
 
     async function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setInputVal(event.currentTarget.value);
         props.onInputChange(event.currentTarget.value);
 
         if (event.currentTarget.value == "") {
@@ -26,13 +28,29 @@ function SearchInput(props: IProps) {
         setInputResults(searchResult);
     }
 
-    function inputBlurEvent() {
+    function hideSearch() {
         setInputResults([]);
         setInputPreviousResults(inputResults);
     }
 
+    function inputBlurEvent(e: React.FocusEvent) {
+        // Search item has been pressed so we need to skip call to hideSearch
+        // and allow onClick to be called
+        if (e.relatedTarget != null && e.relatedTarget.classList.contains("search-item")) {
+            return;
+        }
+
+        hideSearch();
+    }
+
     function inputFocusEvent() {
         setInputResults(inputPreviousResults);
+    }
+
+    function handleSearchItemClick(query: string) {
+        setInputVal(query);
+        props.onInputChange(query);
+        hideSearch();
     }
 
     React.useEffect(() => {
@@ -60,18 +78,19 @@ function SearchInput(props: IProps) {
     }, []);
 
     if (props.disabled && inputResults.length > 0) {
-        inputBlurEvent();
+        hideSearch();
     }
     
     return <>
-        <Input bsSize="lg" onChange={handleInputChange} onBlur={inputBlurEvent} onFocus={inputFocusEvent} 
+        <Input bsSize="lg" onChange={handleInputChange} onBlur={inputBlurEvent} onFocus={inputFocusEvent}
+        value={inputVal}
         placeholder={inputPlaceholderVal} 
         className="shadow"
-        disabled={props.disabled}/>
-        <ListGroup hidden={props.disabled}>
-            <div style={{position: "absolute"}}>
-                {inputResults.map(s => <ListGroupItem key={s}>{s}</ListGroupItem>)}
-            </div>
+        disabled={props.disabled}
+        />
+        <ListGroup hidden={props.disabled} style={{position: "absolute"}}>
+            {inputResults.map(s => <ListGroupItem key={s} onClick={() => handleSearchItemClick(s)} className="search-item" tabIndex={0}>
+                {s}</ListGroupItem>)}
         </ListGroup>
     </>
 }
