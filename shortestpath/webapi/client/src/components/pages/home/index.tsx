@@ -3,9 +3,10 @@ import { Button, Col, Container, Form, Row } from "reactstrap";
 import "./home_style.scss";
 import { ArticleTitle, KnownError } from "@home/request";
 import SearchInput from "./SearchInput";
-import { FindShortestPath } from "@home/request";
+import { FindShortestPath, FindShortestPathError } from "@home/request";
 import PathDisplay from "./PathDisplay";
 import WikiSPLogo from "../WikiSPLogo";
+import ErrorDisplay, { ErrorProps, ErrorType } from "./ErrorDisplay";
 
 function HomePage() {
     const [input1Val, setInput1Val] = React.useState("");
@@ -16,29 +17,31 @@ function HomePage() {
 
     const defaultPathVal: ArticleTitle[] = [] // To avoid typescript casting to any[]
     const [path, setPath] = React.useState(defaultPathVal);
+    const defaultValError: ErrorProps = null;
+    const [errorDisplayProps, setErrorDisplayProps] = React.useState(defaultValError);
 
     async function handleFormSubmit(event: React.FormEvent) {
         event.preventDefault();
+        setErrorDisplayProps(null);
         setPath([]);
         setSearchInProgress(true);
 
         try {
             const pathResult = await FindShortestPath(input1Val, input2Val);
             if (pathResult.length === 0) {
-                alert("No path possible!");
+                setErrorDisplayProps({type: ErrorType.NO_PATH});
             } else {
                 setPath(pathResult);
             }
         } catch(err) {
-            if (err.message === KnownError.INVALID_PARAMETER) {
-                // TODO: Change this
-                alert("An article doesn't exist");
+            if (err.type === KnownError.INVALID_PARAMETER) {
+                setErrorDisplayProps({type: ErrorType.INVALID_ARTICLE, additionalInfo: err.additionalInfo});
             } else {
-                alert("Internal error");
+                setErrorDisplayProps({type: ErrorType.INTERNAL_ERROR});
             }
+        } finally {
+            setSearchInProgress(false);
         }
-
-        setSearchInProgress(false);
     }
 
     return <>
@@ -60,6 +63,7 @@ function HomePage() {
                 </Col>
             </Row>
         </Row>
+        {errorDisplayProps === null ? null : <ErrorDisplay type={errorDisplayProps.type} additionalInfo={errorDisplayProps.additionalInfo}/>}
         <Form onSubmit={handleFormSubmit}>
             <Row className="space-after-inputs">
                 <Col md="6" className="between-input-small-space">

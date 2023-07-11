@@ -1,0 +1,9 @@
+@import "./pathdisplay_style.scss";
+
+.error-display-container {
+    text-align: center;
+    animation: 500ms path-container-animation;
+    color: #fff;
+    background-color: #ea868f;
+    margin-bottom: 2em;
+}

@@ -16,8 +16,8 @@ function PathDisplay(props: IProps) {
     function pathBuilder(idx: number, article: ArticleTitle) {
         const title = article.redirect_to_title === "" ? article.original_title : article.redirect_to_title;
         const lastElem = idx === indexedPath.length - 1;
+        
         // For smaller screens
-
         const nextArrow = <Col md="auto" className="col-path">
             <div className="path-arrow">
                 <svg width="100%" height="auto" viewBox="0 0 100 100">
@@ -32,7 +32,9 @@ function PathDisplay(props: IProps) {
           <Col md="auto" className="col-path">
             <div className="article-info rounded" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="test">
                 <h3>
-                    {title}
+                    <a className="article-info-url" href={`https://en.wikipedia.org/wiki/${encodeURI(title)}`} target="_blank">
+                        {title}
+                    </a>
                 </h3>
             </div>
         </Col>

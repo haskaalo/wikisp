@@ -20,3 +20,9 @@ export const giveErrorFromStatusCode = (status: number) => {
         }
     }
 };
+
+export interface ErrorResponse {
+    status: number;
+    message: string;
+    invalid?: string[];
+}

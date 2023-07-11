@@ -28,9 +28,10 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fromID, fromComponentID, err := database.GetArticleIDsFromTitle(r.URL.Query().Get("from"))
+	fromTitle := r.URL.Query().Get("from")
+	fromID, fromComponentID, err := database.GetArticleIDsFromTitle(fromTitle)
 	if err == sql.ErrNoRows {
-		response.InvalidParameter(w, "from")
+		response.InvalidParameter(w, fromTitle)
 		return
 	} else if err != nil {
 		response.InternalError(w)
@@ -38,9 +39,10 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toID, toComponentID, err := database.GetArticleIDsFromTitle(r.URL.Query().Get("to"))
+	toTitle := r.URL.Query().Get("to")
+	toID, toComponentID, err := database.GetArticleIDsFromTitle(toTitle)
 	if err == sql.ErrNoRows {
-		response.InvalidParameter(w, "to")
+		response.InvalidParameter(w, toTitle)
 		return
 	} else if err != nil {
 		response.InternalError(w)
