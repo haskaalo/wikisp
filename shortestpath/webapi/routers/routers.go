@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/haskaalo/wikisp/webapi/database"
 	"github.com/haskaalo/wikisp/webapi/response"
+	"github.com/haskaalo/wikisp/webapi/routers/api"
 	"log"
 	"net/http"
 	"os"
@@ -23,10 +24,9 @@ func BootstrapRouters() *chi.Mux {
 			Title: "WikiSP - Find paths between Wikipedia articles",
 		})
 	})
-	router.Get("/search", getSearchTitle)
-	router.Get("/find_path", getShortestPath)
-	router.Get("/random_article_titles", getRandomArticles)
-
+	router.Route("/api", func(r chi.Router) {
+		api.BootstrapAPIRouter(r)
+	})
 	assetsPath := os.Getenv("WIKISP_ASSETS_PATH")
 	fs := http.FileServer(http.Dir(assetsPath))
 	router.Handle("/*", http.StripPrefix("/", fs))

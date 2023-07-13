@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { DefinePlugin } = require('webpack');
 
 module.exports = {
     entry: {
@@ -57,5 +58,12 @@ module.exports = {
             filename: "css/styles.[fullhash].css",
             chunkFilename: "css/[id].[chunkhash].css",
         }),
+        new DefinePlugin({
+            BUILDCONFIG: JSON.stringify({
+                isDev: false,
+                apiURL: process.env.API_URL === undefined ? "/api" : process.env.API_URL,
+                recaptchaSiteKey: process.env.GRECAPTCHA_SITE_KEY
+            })
+        })
     ]
 };

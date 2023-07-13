@@ -1,5 +1,6 @@
 import { ErrorType } from "@home/components/pages/home/ErrorDisplay";
 import { ErrorResponse, KnownError, giveErrorFromStatusCode } from "./error";
+import { getStoredToken } from "./botverif";
 
 export interface ArticleTitle {
     original_title: string;
@@ -18,7 +19,8 @@ export class FindShortestPathError extends Error {
 }
 
 export const FindShortestPath = async (from: string, to: string): Promise<ArticleTitle[]> => {
-    const searchParams = new URLSearchParams({from, to})
+    const searchParams = new URLSearchParams({from, to, "sess-token": getStoredToken()});
+    
     const response = await fetch(`${BUILDCONFIG.apiURL}/find_path?${searchParams}`, {
         method: "GET",
         redirect: "follow",

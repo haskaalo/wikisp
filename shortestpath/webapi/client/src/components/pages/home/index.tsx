@@ -1,12 +1,13 @@
 import * as React from "react";
 import { Button, Col, Container, Form, Row } from "reactstrap";
 import "./home_style.scss";
-import { ArticleTitle, KnownError } from "@home/request";
+import { ArticleTitle, KnownError, getStoredToken } from "@home/request";
 import SearchInput from "./SearchInput";
 import { FindShortestPath, FindShortestPathError } from "@home/request";
 import PathDisplay from "./PathDisplay";
 import WikiSPLogo from "../WikiSPLogo";
 import ErrorDisplay, { ErrorProps, ErrorType } from "./ErrorDisplay";
+import CaptchaVerification from "./captchaverification";
 
 function HomePage() {
     const [input1Val, setInput1Val] = React.useState("");
@@ -15,13 +16,32 @@ function HomePage() {
 
     const findPathButtonDisabled = input1Val === "" || input2Val === "" || searchInProgress === true;
 
+    const [askCaptcha, setAskCaptcha] = React.useState(false);
     const defaultPathVal: ArticleTitle[] = [] // To avoid typescript casting to any[]
     const [path, setPath] = React.useState(defaultPathVal);
     const defaultValError: ErrorProps = null;
     const [errorDisplayProps, setErrorDisplayProps] = React.useState(defaultValError);
 
+    function captchaCallBack(success: boolean) {
+        if (success === true) {
+            handleFormSubmit(null);
+        } else {
+            setErrorDisplayProps({type: ErrorType.INTERNAL_ERROR});
+        }
+
+        setAskCaptcha(false);
+    }
+
     async function handleFormSubmit(event: React.FormEvent) {
-        event.preventDefault();
+        if (event != null) {
+            event.preventDefault();
+        }
+
+        if (getStoredToken() === null) {
+            setAskCaptcha(true);
+            return;
+        }
+
         setErrorDisplayProps(null);
         setPath([]);
         setSearchInProgress(true);
@@ -36,6 +56,8 @@ function HomePage() {
         } catch(err) {
             if (err.type === KnownError.INVALID_PARAMETER) {
                 setErrorDisplayProps({type: ErrorType.INVALID_ARTICLE, additionalInfo: err.additionalInfo});
+            } else if (err.type === KnownError.UNAUTHORIZED) {
+                setAskCaptcha(true);
             } else {
                 setErrorDisplayProps({type: ErrorType.INTERNAL_ERROR});
             }
@@ -45,6 +67,7 @@ function HomePage() {
     }
 
     return <>
+        { askCaptcha ? <CaptchaVerification isOpen={true} callbackVerif={captchaCallBack} /> : null }
         <Container fluid className="typical-page-layout">
         <Row className="space-after-title">
             <WikiSPLogo/>

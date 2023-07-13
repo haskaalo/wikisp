@@ -34,3 +34,11 @@ func InternalError(w http.ResponseWriter) {
 		Message: "Internal Server Error",
 	}, http.StatusInternalServerError)
 }
+
+// Unauthorized Respond with a status 401 and a message "Unauthorized"
+func Unauthorized(w http.ResponseWriter) {
+	Respond(w, &basicError{
+		Status:  401,
+		Message: "Unauthorized",
+	}, http.StatusUnauthorized)
+}

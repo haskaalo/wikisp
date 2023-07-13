@@ -15,6 +15,9 @@ export const giveErrorFromStatusCode = (status: number) => {
         case 400: {
             return KnownError.INVALID_PARAMETER
         }
+        case 401: {
+            return KnownError.UNAUTHORIZED
+        }
         default: {
             return null;
         }

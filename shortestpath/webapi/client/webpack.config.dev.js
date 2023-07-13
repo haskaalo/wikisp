@@ -1,8 +1,6 @@
 const { merge } = require('webpack-merge');
 const common = require('./webpack.config.common.js');
 
-const {DefinePlugin} = require('webpack');
-
 module.exports = merge(common, {
     devtool: 'source-map',
     mode: 'development',
@@ -13,10 +11,5 @@ module.exports = merge(common, {
         rules: [
             {enforce: 'pre', test: /\.js$/, loader: 'source-map-loader'},
         ],
-    },
-    plugins: [
-        new DefinePlugin({
-            BUILDCONFIG: JSON.stringify({apiURL: ""})
-        }),
-    ]
+    }
 });

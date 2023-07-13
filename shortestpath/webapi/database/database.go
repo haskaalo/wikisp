@@ -2,7 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/glebarez/go-sqlite"
+	"github.com/go-redis/redis"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
@@ -11,6 +13,7 @@ import (
 
 var (
 	db *sqlx.DB
+	r  *redis.Client
 )
 
 func InitDatabase() {
@@ -25,8 +28,11 @@ func InitDatabase() {
 	log.Println("Connected to SQLITE database")
 }
 
-func CloseDatabase() {
-	_ = db.Close()
+func InitRedis() {
+	r = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%v", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),
+		Password: os.Getenv("REDIS_PASSWORD"),
+	})
 }
 
 type SearchArticleResult struct {

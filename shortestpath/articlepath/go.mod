@@ -1,3 +1,3 @@
-module fanor.dev/wikidg/shortestpath/articlepath
+module github.com/haskaalo/wikisp/articlepath
 
 go 1.20

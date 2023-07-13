@@ -4,10 +4,6 @@ const {DefinePlugin} = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin"); // Uglify
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
-const buildconfig = {
-    isDev: false,
-};
-
 module.exports = merge(common, {
     mode: 'production',
     output: {
@@ -19,10 +15,5 @@ module.exports = merge(common, {
             new TerserPlugin(),
             new CssMinimizerPlugin()
         ]
-    },
-    plugins: [
-        new DefinePlugin({
-            BUILDCONFIG: JSON.stringify(buildconfig)
-        }),
-    ]
+    }
 });

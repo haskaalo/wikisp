@@ -1,8 +1,8 @@
-package routers
+package api
 
 import (
 	"database/sql"
-	"fanor.dev/wikidg/shortestpath/articlepath"
+	"github.com/haskaalo/wikisp/articlepath"
 	"github.com/haskaalo/wikisp/webapi/database"
 	"github.com/haskaalo/wikisp/webapi/response"
 	"log"

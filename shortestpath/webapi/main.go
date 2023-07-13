@@ -11,6 +11,7 @@ import (
 
 func main() {
 	database.InitDatabase()
+	database.InitRedis()
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
