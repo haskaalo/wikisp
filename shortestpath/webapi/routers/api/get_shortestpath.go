@@ -7,6 +7,7 @@ import (
 	"github.com/haskaalo/wikisp/webapi/response"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type articleElement struct {
@@ -29,7 +30,8 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fromTitle := r.URL.Query().Get("from")
-	fromID, fromComponentID, err := database.GetArticleIDsFromTitle(fromTitle)
+	capitalizedFromTitle := strings.ToUpper(fromTitle[:1]) + fromTitle[1:]
+	fromID, fromComponentID, err := database.GetArticleIDsFromTitle(capitalizedFromTitle)
 	if err == sql.ErrNoRows {
 		response.InvalidParameter(w, fromTitle)
 		return
@@ -40,7 +42,8 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 	}
 
 	toTitle := r.URL.Query().Get("to")
-	toID, toComponentID, err := database.GetArticleIDsFromTitle(toTitle)
+	capitalizedToTitle := strings.ToUpper((toTitle[:1])) + toTitle[1:]
+	toID, toComponentID, err := database.GetArticleIDsFromTitle(capitalizedToTitle)
 	if err == sql.ErrNoRows {
 		response.InvalidParameter(w, toTitle)
 		return
