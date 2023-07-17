@@ -4,7 +4,8 @@ import { Modal, ModalHeader, ModalBody } from "reactstrap";
 
 interface Props {
     isOpen: boolean;
-    callbackVerif: (success: boolean) => void;
+    verifCallback: (success: boolean) => void;
+    closedCallback: () => void;
 }
 
 function CaptchaVerification(props: Props) {
@@ -20,16 +21,16 @@ function CaptchaVerification(props: Props) {
             callback: async (response) => {
                 try {
                     const success = await doBotVerif(response);
-                    props.callbackVerif(success);
+                    props.verifCallback(success);
                 } catch (err) {
-                    props.callbackVerif(false);
+                    props.verifCallback(false);
                 }
             }
         });
        }, 500);
     }, []);
 
-    return <Modal isOpen={isOpen} toggle={toggle}>
+    return <Modal isOpen={isOpen} toggle={toggle} onClosed={props.closedCallback}>
         <ModalHeader toggle={toggle}>Are you a robot?</ModalHeader>
         <ModalBody style={{margin: "auto"}}>
             <div id="recaptcha-verif"></div>

@@ -23,7 +23,6 @@ function SearchInput(props: IProps) {
             return;
         }
 
-        // TODO: catch error lol
         const searchResult = await SearchArticleTitle(event.currentTarget.value);
         setInputResults(searchResult);
     }
@@ -53,6 +52,11 @@ function SearchInput(props: IProps) {
         hideSearch();
     }
 
+    function handleKeyDown(e: React.KeyboardEvent, query: string) {
+        if (e.key === "Enter") {
+            handleSearchItemClick(query);
+        }
+    }
     React.useEffect(() => {
         const interval = setInterval(async () => {
             const articleTitles = await GetRandomArticleTitles();
@@ -89,7 +93,8 @@ function SearchInput(props: IProps) {
         disabled={props.disabled}
         />
         <ListGroup hidden={props.disabled} style={{position: "absolute"}}>
-            {inputResults.map(s => <ListGroupItem key={s} onClick={() => handleSearchItemClick(s)} className="search-item" tabIndex={0}>
+            {inputResults.map(s => <ListGroupItem key={s} onClick={() => handleSearchItemClick(s)} 
+            className="search-item" tabIndex={0} onKeyDown={(e) => handleKeyDown(e, s)}>
                 {s}</ListGroupItem>)}
         </ListGroup>
     </>

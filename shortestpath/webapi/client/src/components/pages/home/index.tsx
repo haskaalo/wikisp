@@ -3,11 +3,11 @@ import { Button, Col, Container, Form, Row } from "reactstrap";
 import "./home_style.scss";
 import { ArticleTitle, KnownError, getStoredToken } from "@home/request";
 import SearchInput from "./SearchInput";
-import { FindShortestPath, FindShortestPathError } from "@home/request";
+import { FindShortestPath } from "@home/request";
 import PathDisplay from "./PathDisplay";
 import WikiSPLogo from "../WikiSPLogo";
 import ErrorDisplay, { ErrorProps, ErrorType } from "./ErrorDisplay";
-import CaptchaVerification from "./captchaverification";
+import CaptchaVerification from "./CaptchaVerification";
 
 function HomePage() {
     const [input1Val, setInput1Val] = React.useState("");
@@ -17,6 +17,7 @@ function HomePage() {
     const findPathButtonDisabled = input1Val === "" || input2Val === "" || searchInProgress === true;
 
     const [askCaptcha, setAskCaptcha] = React.useState(false);
+    
     const defaultPathVal: ArticleTitle[] = [] // To avoid typescript casting to any[]
     const [path, setPath] = React.useState(defaultPathVal);
     const defaultValError: ErrorProps = null;
@@ -29,6 +30,10 @@ function HomePage() {
             setErrorDisplayProps({type: ErrorType.INTERNAL_ERROR});
         }
 
+        setAskCaptcha(false);
+    }
+
+    function closedCaptchaCallback() {
         setAskCaptcha(false);
     }
 
@@ -67,14 +72,14 @@ function HomePage() {
     }
 
     return <>
-        { askCaptcha ? <CaptchaVerification isOpen={true} callbackVerif={captchaCallBack} /> : null }
+        { askCaptcha ? <CaptchaVerification isOpen={true} verifCallback={captchaCallBack} closedCallback={closedCaptchaCallback} /> : null }
         <Container fluid className="typical-page-layout">
         <Row className="space-after-title">
             <WikiSPLogo/>
             <Row>
                 <Col>
                 <p className="wikisp-desc d-none d-md-block">
-                <a href="https://en.wikipedia.org/wiki/Wikipedia:Six_degrees_of_Wikipedia">Six Degrees of Wikipedia</a> is a captivating concept inspired by the theory of six degrees of separation, 
+                <a target="_blank" href="https://en.wikipedia.org/wiki/Wikipedia:Six_degrees_of_Wikipedia">Six Degrees of Wikipedia</a> is a captivating concept inspired by the theory of six degrees of separation, 
                 commonly used in social networks, demonstrating that any two Wikipedia articles can be connected within six clicks
                 or fewer. This project specifically focuses on uncovering the shortest path between articles on the English version of Wikipedia, 
                 exploring the vast web of interconnected knowledge present on the platform.
@@ -110,7 +115,7 @@ function HomePage() {
         <div className="footer-text">
         Made with ❤️ by Joey
         <br/>
-        <a href="https://github.com/haskaalo/wikisp">GitHub repository</a>
+        <a target="_blank" href="https://github.com/haskaalo/wikisp">GitHub repository</a>
         </div>
     </div>
     </>;
