@@ -1,10 +1,11 @@
 package api
 
 import (
-	"github.com/haskaalo/wikisp/webapi/database"
-	"github.com/haskaalo/wikisp/webapi/response"
 	"log"
 	"net/http"
+
+	"github.com/haskaalo/wikisp/webapp/database"
+	"github.com/haskaalo/wikisp/webapp/response"
 )
 
 type getSearchTitleResponse struct {

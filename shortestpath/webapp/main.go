@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/haskaalo/wikisp/webapi/database"
-	"github.com/haskaalo/wikisp/webapi/routers"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/haskaalo/wikisp/webapp/database"
+	"github.com/haskaalo/wikisp/webapp/routers"
 )
 
 func main() {

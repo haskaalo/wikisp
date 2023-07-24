@@ -1,4 +1,4 @@
-module github.com/haskaalo/wikisp/webapi
+module github.com/haskaalo/wikisp/webapp
 
 go 1.20
 

@@ -2,10 +2,11 @@ package middlewares
 
 import (
 	"context"
-	"github.com/haskaalo/wikisp/webapi/database"
-	"github.com/haskaalo/wikisp/webapi/response"
 	"log"
 	"net/http"
+
+	"github.com/haskaalo/wikisp/webapp/database"
+	"github.com/haskaalo/wikisp/webapp/response"
 )
 
 const UserSessionContextKey = "user-sess"

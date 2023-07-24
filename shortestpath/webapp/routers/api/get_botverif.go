@@ -2,13 +2,14 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/haskaalo/wikisp/webapi/database"
-	"github.com/haskaalo/wikisp/webapi/response"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/haskaalo/wikisp/webapp/database"
+	"github.com/haskaalo/wikisp/webapp/response"
 )
 
 type RecaptchaResponse struct {

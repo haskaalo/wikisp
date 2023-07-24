@@ -2,12 +2,13 @@ package api
 
 import (
 	"database/sql"
-	"github.com/haskaalo/wikisp/articlepath"
-	"github.com/haskaalo/wikisp/webapi/database"
-	"github.com/haskaalo/wikisp/webapi/response"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/haskaalo/wikisp/articlepath"
+	"github.com/haskaalo/wikisp/webapp/database"
+	"github.com/haskaalo/wikisp/webapp/response"
 )
 
 type articleElement struct {

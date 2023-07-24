@@ -1,13 +1,14 @@
 package routers
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/haskaalo/wikisp/webapi/database"
-	"github.com/haskaalo/wikisp/webapi/response"
-	"github.com/haskaalo/wikisp/webapi/routers/api"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/haskaalo/wikisp/webapp/database"
+	"github.com/haskaalo/wikisp/webapp/response"
+	"github.com/haskaalo/wikisp/webapp/routers/api"
 )
 
 // BootstrapRouters Create a router with every paths

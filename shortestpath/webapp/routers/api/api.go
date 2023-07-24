@@ -1,9 +1,10 @@
 package api
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/haskaalo/wikisp/webapi/middlewares"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/haskaalo/wikisp/webapp/middlewares"
 )
 
 func BootstrapAPIRouter(router chi.Router) http.Handler {
