@@ -62,7 +62,7 @@ module.exports = {
             BUILDCONFIG: JSON.stringify({
                 isDev: false,
                 apiURL: process.env.API_URL === undefined ? "/api" : process.env.API_URL,
-                recaptchaSiteKey: process.env.GRECAPTCHA_SITE_KEY
+                recaptchaSiteKey: process.env.RECAPTCHA_SITEKEY
             })
         })
     ]
