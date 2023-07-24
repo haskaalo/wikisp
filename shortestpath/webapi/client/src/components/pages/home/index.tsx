@@ -17,7 +17,7 @@ function HomePage() {
     const findPathButtonDisabled = input1Val === "" || input2Val === "" || searchInProgress === true;
 
     const [askCaptcha, setAskCaptcha] = React.useState(false);
-    
+
     const defaultPathVal: ArticleTitle[] = [] // To avoid typescript casting to any[]
     const [path, setPath] = React.useState(defaultPathVal);
     const defaultValError: ErrorProps = null;
@@ -53,6 +53,7 @@ function HomePage() {
 
         try {
             const pathResult = await FindShortestPath(input1Val, input2Val);
+            
             if (pathResult.length === 0) {
                 setErrorDisplayProps({type: ErrorType.NO_PATH});
             } else {
