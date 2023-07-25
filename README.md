@@ -26,6 +26,7 @@ Next, unless you want to want to build a clean SQLITE3 graph database and csv fi
 make dump-processing
 ```
 
+The following section is a step by step guide on building adjacency lists 
 #### 1. Parsing dumps to CSV files
 After environnement variables are set the first step required to build Wikipedia link adjacency lists is to parse the dumps and write them to a csv file (Note: They are written to a CSV for faster parsing). This is done doing the following command on a terminal:
 
