@@ -1,6 +1,6 @@
 # wikisp
 
-Six Degrees of Wikipedia is a captivating concept inspired by the theory of six degrees of separation, commonly used in social networks, demonstrating that any two Wikipedia articles can be connected within six clicks or fewer. This project specifically focuses on uncovering the shortest path between articles on the English version of Wikipedia, exploring the vast web of interconnected knowledge present on the platform.
+[Six Degrees of Wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Six_degrees_of_Wikipedia) is a captivating concept inspired by the theory of six degrees of separation, commonly used in social networks, demonstrating that any two Wikipedia articles can be connected within six clicks or fewer. This project specifically focuses on uncovering the shortest path between articles on the English version of Wikipedia, exploring the vast web of interconnected knowledge present on the platform.
 
 This project also allows you to build a clean SQLITE3 database with a adjacency list and partioned graph for easy traversal and use in your own projects.
 
