@@ -4,6 +4,12 @@ Six Degrees of Wikipedia is a captivating concept inspired by the theory of six 
 
 This project also allows you to build a clean SQLITE3 database with a adjacency list and partioned graph for easy traversal and use in your own projects.
 
+## Table of contents
+
+- [Requirements](#requirements)
+- [Building adjacency links (graph db)](#1-building-wikipedia-link-adjacency-lists)
+- [Running the webserver](#2-running-the-webserver)
+
 ## Requirements
 
 | Tool| Explanation for why it's needed |
