@@ -30,5 +30,5 @@ step4-dp:
 step5-dp:
 	cd dump-processing && python3 main.py --cleanup
 
-.PHONY:
+.PHONY: dump-processing
 dump-processing: step1-dp step2-dp step3-dp step4-dp step5-dp

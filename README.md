@@ -4,6 +4,15 @@ Six Degrees of Wikipedia is a captivating concept inspired by the theory of six 
 
 This project also allows you to build a clean SQLITE3 database with a adjacency list and partioned graph for easy traversal and use in your own projects.
 
+## Requirements
+
+| Tool| Explanation for why it's needed |
+| ---  | ----------- |
+| Python 3.x | Used for dump processing |
+| Go 1.20 | Used to build serialized adjacency lists and webserver |
+| NodeJS v18+ | Needed for development only |
+| Docker | Build and run webserver |
+
 ## Getting started
 
 ### 1. Building Wikipedia link adjacency lists
@@ -20,13 +29,14 @@ Once downloaded, please set the following environnement variables:
 | ADJACENCY_LIST_PATH | Path to serialized adjacency list (Should equal to `OUT_DIR`) (Optional if you're not planning to run the webserver) |
 
 
-Next, unless you want to want to build a clean SQLITE3 graph database and csv files for your own project run this command to run dump processing:
+To run all the steps for dump processing run this command on a terminal:
 
 ```
 make dump-processing
 ```
 
-The following section is a step by step guide on building adjacency lists 
+The following section is a step by step guide on building adjacency lists (Not needed if `make dump-processing` was ran)
+
 #### 1. Parsing dumps to CSV files
 After environnement variables are set the first step required to build Wikipedia link adjacency lists is to parse the dumps and write them to a csv file (Note: They are written to a CSV for faster parsing). This is done doing the following command on a terminal:
 
