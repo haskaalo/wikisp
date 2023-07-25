@@ -9,3 +9,23 @@ run-webapp:
 .PHONY: stop-webapp
 stop-webapp:
 	cd shortestpath/webapp && docker-compose down
+
+.PHONY: step1-dp
+step1-dp:
+	cd dump-processing && python3 main.py
+
+.PHONY: step2-dp
+step2-dp:
+	cd dump-processing && python3 main.py --csvtodb
+
+.PHONY: step3-dp
+step3-dp:
+	cd dump-processing && python3 main.py --partition
+
+.PHONY: step4-dp
+step4-dp:
+	cd shortestpath/cmd && go run main.go
+
+.PHONY: step5-dp
+step5-dp:
+	cd dump-processing && python3 main.py --cleanup

@@ -127,6 +127,7 @@ if __name__ == "__main__":
     parser.add_argument("--reformat_db", action="store_true")
     parser.add_argument("--csvtodb", action="store_true")
     parser.add_argument("--partition", action="store_true")
+    parser.add_argument("--cleanup", action="store_true")
     args = parser.parse_args()
 
     if args.reformat_db:
@@ -143,5 +144,13 @@ if __name__ == "__main__":
         parseCSV()
     elif args.partition:
         partition.performPartition()
+    elif args.cleanup:
+        db = database.connect()
+        try:
+            db.cleanup()
+            db.commit()
+        except Exception as e:
+            print("Failed to cleanup db: {}".format(e))
+            db.rollback()
     else:
         dumpProcessing()

@@ -148,6 +148,14 @@ class DatabaseHelper:
         print("REFORMAT: DONE replacing all redirects with the final destination")
         print("REFORMAT DONE!")
 
+    def cleanup(self):
+        print("CLEANUP: Starting cleanup (delete)")
+        self._cursor.execute("DELETE FROM article_link_edge_directed")
+        self._cursor.execute("DELETE FROM redirect")
+        self._cursor.execute("DELETE FROM article_component")
+        self._cursor.execute("DELETE FROM article_component_connects")
+        print("CLEAUP: Done cleaning up (delete)")
+
     def commit(self):
         self.connection.commit()
 
