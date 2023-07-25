@@ -19,7 +19,14 @@ Once downloaded, please set the following environnement variables:
 | SQLITE3_DB_PATH | Path to a SQLite3 database for informations about adjacency and articles |
 | ADJACENCY_LIST_PATH | Path to serialized adjacency list (Should equal to `OUT_DIR`) (Optional if you're not planning to run the webserver) |
 
-1. Parsing dumps to CSV files
+
+Next, unless you want to want to build a clean SQLITE3 graph database and csv files for your own project run this command to run dump processing:
+
+```
+make dump-processing
+```
+
+#### 1. Parsing dumps to CSV files
 After environnement variables are set the first step required to build Wikipedia link adjacency lists is to parse the dumps and write them to a csv file (Note: They are written to a CSV for faster parsing). This is done doing the following command on a terminal:
 
 ```
@@ -32,7 +39,7 @@ This will create 3 csv files (article.csv, redirect.csv, pagesmentioned.csv) to 
 * redirect.csv: Articles title that redirects to another article
 * pagesmentioned.csv: Article A has a link to Article B
 
-2. Writing CSV files to SQLITE3 database
+#### 2. Writing CSV files to SQLITE3 database
 Once the dumps has been processed by step 1, it is necessary to write them to a sqlite3 database to perform some data manipulation such as deleting articles that don't exists, removing redirect loops, knowing which articles are simply aliales to another article, and partioning the graph in step 3.
 
 This is done using the command on a terminal:
@@ -41,10 +48,10 @@ This is done using the command on a terminal:
 make step2-dp
 ```
 
-3. "Partitioning" the graph
+#### 3. "Partitioning" the graph
 Once step 2 is done, the final step required is partioning the graph. This is done to reduce execution time for requests to articles that doesn't have a path.
 
-NOTE: Because this is a directed graph, partitioning the graph doesn't allow to know **every** pairs of articles that doesn't have a path but a significant amount.
+**NOTE**: Because this is a directed graph, partitioning the graph doesn't allow to know **every** pairs of articles that doesn't have a path but a significant amount.
 
 This is done using the following command:
 ```
@@ -53,13 +60,13 @@ make step3-dp
 
 **NOTE**: Don't run this if you want to use the adjacency lists for your own projects.
 
-4. Optional: Building the serialized adjacency lists for the webserver to use
+#### 4. Optional: Building the serialized adjacency lists for the webserver to use
 
 ```
 make step4-dp
 ```
 
-5. Optional: Cleaning up the database to reduce size
+#### 5. Optional: Cleaning up the database to reduce size
 After step 3, there are some large tables in the database set by `SQLITE3_DB_PATH` such as article_link_edge_directed that will not be used by the webserver. This can be done by running
 
 ```
@@ -81,13 +88,13 @@ Environment variables needed:
 | RECAPTCHA_SECRET | Google Recaptcha secret |
 | RECAPTCHA_SITEKEY | Google Recaptcha site key|
 
-1. Build the webserver image
+#### 1. Build the webserver image
 
 ```
 make build-image
 ```
 
-2. Running the server
+#### 2. Running the server
 
 ```
 make run-webapp
