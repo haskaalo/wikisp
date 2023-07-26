@@ -5,6 +5,7 @@ declare const BUILDCONFIG: {
 }
 
 declare module '*.svg';
+declare module '*.jpg';
 
 // Cloudflare turnstile
 declare namespace turnstile {

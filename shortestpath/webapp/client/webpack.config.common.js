@@ -40,6 +40,13 @@ module.exports = {
                 }
             },
             {
+                test: /\.(jpg)$/,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'img/[name].jpg'
+                }
+            },
+            {
                 test: /\.ttf/,
                 type: 'asset/resource',
                 generator: {
