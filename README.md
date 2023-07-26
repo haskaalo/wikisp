@@ -68,7 +68,11 @@ This will create 3 csv files (article.csv, redirect.csv, pagesmentioned.csv) to 
     | Article A title actually redirects to | Article B title |
     | ------------------------------------| ----------------- |
     | string | string |
+
 * pagesmentioned.csv: Article A has a link to Article B
+    | Article A title | Contains links to article B title|
+    | ----------| ---------------------------- |
+    | string | string |
 
 #### 2. Writing CSV files to SQLITE3 database
 Once the dumps has been processed by step 1, it is necessary to write them to a sqlite3 database to perform some data manipulation such as deleting articles that don't exists, removing redirect loops, knowing which articles are simply aliales to another article, and partioning the graph in step 3.
