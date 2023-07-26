@@ -13,15 +13,17 @@ function SearchInput(props: IProps) {
     const [inputPreviousResults, setInputPreviousResults] = React.useState(defaultVal);
     const [inputPlaceholderVal, setInputPlaceholderVal] = React.useState("");
     const [inputVal, setInputVal] = React.useState("");
+    const inputValRef = React.useRef(inputVal); // Necessary for access inside timeout
+    inputValRef.current = inputVal;
 
-    let searchTimeoutInProgress = false;
-    let searchTimeout = setTimeout(() => {}, 0);
+    const searchTimeoutInProgress = React.useRef(false);
+    const searchTimeout = React.useRef(setTimeout(() => {}, 0));
 
     async function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         async function doSearchResult() {
-            const searchResult = await SearchArticleTitle(inputVal);
+            const searchResult = await SearchArticleTitle(inputValRef.current);
             setInputResults(searchResult);
-            searchTimeoutInProgress = false;
+            searchTimeoutInProgress.current = false;
         }
 
         setInputVal(event.currentTarget.value);
@@ -33,16 +35,14 @@ function SearchInput(props: IProps) {
         }
 
         if (searchTimeoutInProgress) {
-            window.clearTimeout(searchTimeout);
+            clearTimeout(searchTimeout.current);
         }
-
-        searchTimeoutInProgress = true;
-        searchTimeout = setTimeout(() => {
-            console.log("called")
+    
+        searchTimeoutInProgress.current = true;
+        searchTimeout.current = setTimeout(() => {
             doSearchResult();
-        }, 400);
+        }, 300);
     }
-
     function hideSearch() {
         setInputResults([]);
         setInputPreviousResults(inputResults);
@@ -73,6 +73,7 @@ function SearchInput(props: IProps) {
             handleSearchItemClick(query);
         }
     }
+
     React.useEffect(() => {
         const interval = setInterval(async () => {
             const articleTitles = await GetRandomArticleTitles();

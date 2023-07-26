@@ -12,7 +12,7 @@ import (
 	"github.com/haskaalo/wikisp/webapp/response"
 )
 
-type RecaptchaResponse struct {
+type CaptchaResponse struct {
 	Success     bool   `json:"success"`
 	HostName    string `json:"hostname"`
 	ChallengeTS string `json:"challenge_ts"`
@@ -41,7 +41,7 @@ func getBotVerif(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respJSON := &RecaptchaResponse{}
+	respJSON := &CaptchaResponse{}
 	err = json.NewDecoder(resp.Body).Decode(respJSON)
 	if err != nil {
 		response.InternalError(w)
