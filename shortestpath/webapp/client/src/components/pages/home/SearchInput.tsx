@@ -14,7 +14,16 @@ function SearchInput(props: IProps) {
     const [inputPlaceholderVal, setInputPlaceholderVal] = React.useState("");
     const [inputVal, setInputVal] = React.useState("");
 
+    let searchTimeoutInProgress = false;
+    let searchTimeout = setTimeout(() => {}, 0);
+
     async function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        async function doSearchResult() {
+            const searchResult = await SearchArticleTitle(inputVal);
+            setInputResults(searchResult);
+            searchTimeoutInProgress = false;
+        }
+
         setInputVal(event.currentTarget.value);
         props.onInputChange(event.currentTarget.value);
 
@@ -23,8 +32,15 @@ function SearchInput(props: IProps) {
             return;
         }
 
-        const searchResult = await SearchArticleTitle(event.currentTarget.value);
-        setInputResults(searchResult);
+        if (searchTimeoutInProgress) {
+            window.clearTimeout(searchTimeout);
+        }
+
+        searchTimeoutInProgress = true;
+        searchTimeout = setTimeout(() => {
+            console.log("called")
+            doSearchResult();
+        }, 400);
     }
 
     function hideSearch() {

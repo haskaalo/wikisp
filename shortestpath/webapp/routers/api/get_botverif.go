@@ -25,16 +25,16 @@ type getSessionTokenResponse struct {
 
 // getSessionToken Validate if user is a robot through Google recaptcha
 func getBotVerif(w http.ResponseWriter, r *http.Request) {
-	if !r.URL.Query().Has("recaptchaResponse") {
-		response.InvalidParameter(w, "recaptchaResponse")
+	if !r.URL.Query().Has("captchaResponse") {
+		response.InvalidParameter(w, "captchaResponse")
 		return
 	}
 	params := url.Values{}
-	params.Add("secret", os.Getenv("RECAPTCHA_SECRET"))
-	params.Add("response", r.URL.Query().Get("recaptchaResponse"))
+	params.Add("secret", os.Getenv("CAPTCHA_SECRET"))
+	params.Add("response", r.URL.Query().Get("captchaResponse"))
 
-	resp, err := http.Post("https://www.google.com/recaptcha/api/siteverify?"+params.Encode(),
-		"application/x-www-form-urlencoded", strings.NewReader(""))
+	resp, err := http.Post("https://challenges.cloudflare.com/turnstile/v0/siteverify",
+		"application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
 		response.InternalError(w)
 		log.Println(err)

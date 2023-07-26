@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/haskaalo/wikisp/webapp/database"
 	"github.com/haskaalo/wikisp/webapp/response"
@@ -24,6 +25,11 @@ func GetSession(r *http.Request) *database.Session {
 // RequireSession return unauthorized in JSON if user is not verified by captcha
 func RequireSession(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		if os.Getenv("CAPTCHA_ENABLED") == "0" {
+			next.ServeHTTP(rw, r)
+			return
+		}
+
 		session := GetSession(r)
 		if session == nil {
 			response.Unauthorized(rw)

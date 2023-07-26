@@ -60,9 +60,9 @@ module.exports = {
         }),
         new DefinePlugin({
             BUILDCONFIG: JSON.stringify({
-                isDev: false,
                 apiURL: process.env.API_URL === undefined ? "/api" : process.env.API_URL,
-                recaptchaSiteKey: process.env.RECAPTCHA_SITEKEY
+                captchaSiteKey: process.env.CAPTCHA_SITEKEY,
+                captchaEnabled: process.env.CAPTCHA_ENABLED === undefined ? true : process.env.CAPTCHA_ENABLED === "1",
             })
         })
     ]

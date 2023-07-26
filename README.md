@@ -8,7 +8,9 @@ This project also allows you to build a clean SQLITE3 database with a adjacency 
 
 - [Requirements](#requirements)
 - [Building adjacency links (graph db)](#1-building-wikipedia-link-adjacency-lists)
-- [Running the webserver](#2-running-the-webserver)
+- [Running the webserver](#running-the-webserver)
+    - [In production mode](#in-production-mode)
+    - [In development mode](#in-development-mode)
 
 ## Requirements
 
@@ -21,7 +23,7 @@ This project also allows you to build a clean SQLITE3 database with a adjacency 
 
 ## Getting started
 
-### 1. Building Wikipedia link adjacency lists
+### Building Wikipedia link adjacency lists
 
 In order to build Wikipedia link adjacency it is required to download a Wikipedia dump file from [here (~30gb)](https://dumps.wikimedia.org/backup-index.html). The file required to download from Wikipedia archives should be named: `enwiki-xxxxxxxx-pages-articles-multistream.xml.bz2`.
 
@@ -41,7 +43,12 @@ To run all the steps for dump processing run this command on a terminal:
 make dump-processing
 ```
 
-The following section is a step by step guide on building adjacency lists (Not needed if `make dump-processing` was ran)
+
+### Detailed guide (To keep clean CSV and SQLite3 graph database and)
+The following section is a step by step guide on building wikipedia link adjacency lists in a CSV format which is not processed and in a SQLite3 database format that 
+
+
+The SQLite3 schema is [available here](https://github.com/haskaalo/wikisp/blob/main/dump-processing/database/migrations/1_init_sqlite.sql)
 
 #### 1. Parsing dumps to CSV files
 After environnement variables are set the first step required to build Wikipedia link adjacency lists is to parse the dumps and write them to a csv file (Note: They are written to a CSV for faster parsing). This is done doing the following command on a terminal:
@@ -52,18 +59,27 @@ make step1-dp
 
 This will create 3 csv files (article.csv, redirect.csv, pagesmentioned.csv) to the directory set by `OUT_DIR`.
 
-* article.csv: Article titles
-* redirect.csv: Articles title that redirects to another article
+* article.csv:
+    | Article titles |
+    | --------------- |
+    | string |
+
+* redirect.csv:
+    | Article A title actually redirects to | Article B title |
+    | ------------------------------------| ----------------- |
+    | string | string |
 * pagesmentioned.csv: Article A has a link to Article B
 
 #### 2. Writing CSV files to SQLITE3 database
 Once the dumps has been processed by step 1, it is necessary to write them to a sqlite3 database to perform some data manipulation such as deleting articles that don't exists, removing redirect loops, knowing which articles are simply aliales to another article, and partioning the graph in step 3.
+
 
 This is done using the command on a terminal:
 
 ```
 make step2-dp
 ```
+
 
 #### 3. "Partitioning" the graph
 Once step 2 is done, the final step required is partioning the graph. This is done to reduce execution time for requests to articles that doesn't have a path.
@@ -92,9 +108,28 @@ make step5-dp
 
 **NOTE**: Running `VACUUM` in the SQLite3 database will reduce the size also.
 
-### 2. Running the webserver
+### Running the webserver
 
-This is for production only. For development check out the development section.
+#### In production mode
+
+This is for production only.
+
+
+**Requirement**: Docker and Docker Compose
+
+1. Build the webserver image
+
+    ```
+    make build-image
+    ```
+
+2. Running the server
+
+    ```
+    make run-webapp
+    ```
+
+#### In development mode
 
 Environment variables needed:
 
@@ -102,17 +137,33 @@ Environment variables needed:
 | ---  | ----------- |
 | ADJACENCY_LIST_PATH | Path to serialized adjacency list directory generated in section 1|
 | SQLITE3_DB_DIR | Path to SQLITE3 database directory generated in section 1 |
-| RECAPTCHA_SECRET | Google Recaptcha secret |
-| RECAPTCHA_SITEKEY | Google Recaptcha site key|
+| CAPTCHA_ENABLED | Determine if captcha should be enabled  (default: 1)
+| CAPTCHA_SECRET | Google Recaptcha secret (Optional) |
+| CAPTCHA_SITEKEY | Google Recaptcha site key (optional) |
 
-#### 1. Build the webserver image
+1. Run webpack to enable hot reloading of the webpage
 
-```
-make build-image
-```
 
-#### 2. Running the server
+    ```
+    make webpack-watch
+    cd shortestpath/webapp/client && npm run watch
+    ```
 
-```
-make run-webapp
-```
+2. Host a Redis server
+    
+    Environment variables needed:
+
+    | Name | Description |
+    | -----| ------------|
+    | REDIS_HOST| Hostname where Redis is running |
+    | REDIS_PORT | Port where Redis is running |
+    
+
+2. Run the webserver
+
+    Environment variable `WIKISP_DEBUG` must be set to 1
+    
+    ```
+    make run-webpp-dev
+    cd shortestpath/webapp && go run main.go
+    ```

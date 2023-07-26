@@ -11,7 +11,6 @@
   "author": "haskaalo",
   "license": "ISC",
   "devDependencies": {
-    "@types/grecaptcha": "^3.0.4",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "css-loader": "^6.8.1",

@@ -18,7 +18,7 @@ interface getBotVerifResponse {
 }
 
 export async function doBotVerif(gRecaptchaResponse: string) {
-    const response = await fetch(`${BUILDCONFIG.apiURL}/bot-verif?recaptchaResponse=${encodeURI(gRecaptchaResponse)}`, {
+    const response = await fetch(`${BUILDCONFIG.apiURL}/bot-verif?captchaResponse=${encodeURI(gRecaptchaResponse)}`, {
         method: "GET",
         redirect: "follow"
     }).catch((err) => {

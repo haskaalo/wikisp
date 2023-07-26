@@ -1,5 +1,10 @@
-.idea/**
-__pycache__/
-target/
+.idea/
+.vscode/
+
+
 .DS_STORE
+__pycache__/
+*.exe
+
 *.env
+*.gob

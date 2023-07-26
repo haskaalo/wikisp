@@ -42,7 +42,7 @@ function HomePage() {
             event.preventDefault();
         }
 
-        if (getStoredToken() === null) {
+        if (getStoredToken() === null && BUILDCONFIG.captchaEnabled) {
             setAskCaptcha(true);
             return;
         }

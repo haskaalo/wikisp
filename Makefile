@@ -1,6 +1,6 @@
 .PHONY: build-image
 build-image:
-	cd shortestpath && docker build -t webapp-server:latest -f ./webapp/Dockerfile --build-arg RECAPTCHA_SITEKEY .
+	cd shortestpath && docker build -t webapp-server:latest -f ./webapp/Dockerfile --build-arg CAPTCHA_SITEKEY .
 
 .PHONY: run-webapp
 run-webapp:

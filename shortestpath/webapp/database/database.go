@@ -29,10 +29,16 @@ func InitDatabase() {
 }
 
 func InitRedis() {
+	log.Printf("Connecting to redis at %s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
 	r = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%v", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),
 		Password: os.Getenv("REDIS_PASSWORD"),
 	})
+	err := r.Ping().Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Connected to redis")
 }
 
 type SearchArticleResult struct {

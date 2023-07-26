@@ -14,10 +14,10 @@ function CaptchaVerification(props: Props) {
 
     React.useEffect(() => {
        setTimeout(() => {
-        if (document.getElementById("recaptcha-verif") === null) return;
+        if (document.getElementById("captcha-verif") === null) return;
 
-        grecaptcha.render("recaptcha-verif", {
-            sitekey: BUILDCONFIG.recaptchaSiteKey,
+        turnstile.render("#captcha-verif", {
+            sitekey: BUILDCONFIG.captchaSiteKey,
             callback: async (response) => {
                 try {
                     const success = await doBotVerif(response);
@@ -33,7 +33,7 @@ function CaptchaVerification(props: Props) {
     return <Modal isOpen={isOpen} toggle={toggle} onClosed={props.closedCallback}>
         <ModalHeader toggle={toggle}>Are you a robot?</ModalHeader>
         <ModalBody style={{margin: "auto"}}>
-            <div id="recaptcha-verif"></div>
+            <div id="captcha-verif"></div>
         </ModalBody>
     </Modal>
 }

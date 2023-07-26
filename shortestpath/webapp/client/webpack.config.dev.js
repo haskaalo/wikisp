@@ -1,5 +1,6 @@
 const { merge } = require('webpack-merge');
 const common = require('./webpack.config.common.js');
+const { DefinePlugin } = require('webpack');
 
 module.exports = merge(common, {
     devtool: 'source-map',
