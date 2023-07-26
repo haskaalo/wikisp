@@ -8,6 +8,7 @@ import PathDisplay from "./PathDisplay";
 import WikiSPLogo from "../WikiSPLogo";
 import ErrorDisplay, { ErrorProps, ErrorType } from "./ErrorDisplay";
 import CaptchaVerification from "./CaptchaVerification";
+import TimeElapsedSearch from "./TimeElapsedSearch";
 
 function HomePage() {
     const [input1Val, setInput1Val] = React.useState("");
@@ -105,7 +106,7 @@ function HomePage() {
             <Row>
                 <Col/>
                 <Col md="4">
-                    <Button type="submit"  style={{width: "100%"}} disabled={findPathButtonDisabled}>Find path!</Button>
+                    <Button type="submit"  style={{width: "100%"}} disabled={findPathButtonDisabled}>Find path!{searchInProgress ? <TimeElapsedSearch/> : ""}</Button>
                 </Col>
                 <Col/>
             </Row>
