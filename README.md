@@ -114,6 +114,15 @@ make step5-dp
 
 This is for production only.
 
+Environment variables needed:
+
+| Name | Description |
+| ---  | ----------- |
+| ADJACENCY_LIST_PATH | Path to serialized adjacency list directory generated in section 1|
+| SQLITE3_DB_DIR | Path to SQLITE3 database **directory** generated in section 1 |
+| CAPTCHA_ENABLED | Determine if captcha should be enabled  (default: 1)
+| CAPTCHA_SECRET | Google Recaptcha secret (Optional) |
+| CAPTCHA_SITEKEY | Google Recaptcha site key (optional) |
 
 **Requirement**: Docker and Docker Compose
 
@@ -136,7 +145,7 @@ Environment variables needed:
 | Name | Description |
 | ---  | ----------- |
 | ADJACENCY_LIST_PATH | Path to serialized adjacency list directory generated in section 1|
-| SQLITE3_DB_DIR | Path to SQLITE3 database directory generated in section 1 |
+| SQLITE3_DB_PATH | Path to SQLITE3 database **file** generated in section 1 |
 | CAPTCHA_ENABLED | Determine if captcha should be enabled  (default: 1)
 | CAPTCHA_SECRET | Google Recaptcha secret (Optional) |
 | CAPTCHA_SITEKEY | Google Recaptcha site key (optional) |
