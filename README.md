@@ -27,7 +27,7 @@ This project also allows you to build a clean SQLITE3 database with a adjacency 
 
 In order to build Wikipedia link adjacency it is required to download a Wikipedia dump file from [here (~30gb)](https://dumps.wikimedia.org/backup-index.html). The file required to download from Wikipedia archives should be named: `enwiki-xxxxxxxx-pages-articles-multistream.xml.bz2`.
 
-Once downloaded, please set the following environnement variables:
+Once downloaded, set the following environnement variables:
 
 | Name | Description |
 | ---  | ----------- |
@@ -44,7 +44,7 @@ make dump-processing
 ```
 
 
-### Detailed guide (To keep clean CSV and SQLite3 graph database and)
+### Detailed guide (To keep clean CSV and SQLite3 graph database)
 The following section is a step by step guide on building wikipedia link adjacency lists in a CSV format which is not processed and in a SQLite3 database format that 
 
 
@@ -75,7 +75,7 @@ This will create 3 csv files (article.csv, redirect.csv, pagesmentioned.csv) to 
     | string | string |
 
 #### 2. Writing CSV files to SQLITE3 database
-Once the dumps has been processed by step 1, it is necessary to write them to a sqlite3 database to perform some data manipulation such as deleting articles that don't exists, removing redirect loops, knowing which articles are simply aliales to another article, and partioning the graph in step 3.
+Once the dumps has been processed by step 1, it is necessary to write them to a sqlite3 database to perform some data manipulation such as deleting articles that don't exists, removing redirect loops and chains, knowing which articles are simply aliases to another article, and partioning the graph in step 3.
 
 
 This is done using the command on a terminal:
@@ -151,8 +151,8 @@ Environment variables needed:
 | ADJACENCY_LIST_PATH | Path to serialized adjacency list directory generated in section 1|
 | SQLITE3_DB_PATH | Path to SQLITE3 database **file** generated in section 1 |
 | CAPTCHA_ENABLED | Determine if captcha should be enabled  (default: 1)
-| CAPTCHA_SECRET | Google Recaptcha secret (Optional) |
-| CAPTCHA_SITEKEY | Google Recaptcha site key (optional) |
+| CAPTCHA_SECRET | Captcha secret (Optional) |
+| CAPTCHA_SITEKEY | Captcha site key (Optional) |
 
 1. Run webpack to enable hot reloading of the webpage
 

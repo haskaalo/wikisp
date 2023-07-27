@@ -87,7 +87,7 @@ function HomePage() {
                 exploring the vast web of interconnected knowledge present on the platform.
                 </p>
                 <p className="wikisp-desc d-md-none">
-                Six Degrees of Wikipedia is a captivating concept demonstrating that any two Wikipedia articles can be connected within six clicks
+                <a target="_blank" href="https://en.wikipedia.org/wiki/Wikipedia:Six_degrees_of_Wikipedia">Six Degrees of Wikipedia</a> is a captivating concept demonstrating that any two Wikipedia articles can be connected within six clicks
                 or fewer. This project focuses on uncovering the shortest path between articles on the English version of Wikipedia
                 </p>
                 </Col>
