@@ -63,7 +63,7 @@ func getShortestPath(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := articlepath.ComputePathBFS(fromID, toID, database.ArticleAdjacencyList, database.RedirectMap)
-	var resultJSON []articleElement
+	resultJSON := []articleElement{}
 
 	for _, articleID := range result {
 		originalTitle, err := database.GetArticleTitleFromID(articleID)
